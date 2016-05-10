@@ -1,6 +1,8 @@
 #include "lexer.h"
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <stdio.h>
 
 struct _input_t {
     char *stream;
@@ -13,21 +15,63 @@ bool lexer_init(input_t *input, const char *stream) {
     const size_t size = strlen(stream);
     in->stream = malloc(size * sizeof(char));
     strncpy(in->stream, stream, size);
-    in->end = in->stream + size;
     in->pos = in->stream;
-    input = (void*)in;
+    in->end = in->pos + size;
+    *input = (void*)in;
+
     return true;
 }
 
 bool lexer_destroy(input_t *input) {
-    if (!input)
+    if (!*input)
         return true;
-    struct _input_t *in = (struct _input_t*)input;
+    struct _input_t *in = (struct _input_t*)*input;
     free(in->stream);
     free(in);
+    *input = 0;
     return true;
 }
 
-bool lexer_lex(input_t *input, token_t *token) {
-    return false;
+bool lexer_lex(input_t input, token_t *token) {
+    struct _input_t *in = (struct _input_t*)input;
+    if (in->pos >= in->end) {
+        printf("END DETECTED\n");
+        *token = TOKEN_EOF;
+        return false;
+    } else {
+        while (isspace(*in->pos) && in->pos < in->end) {
+            ++in->pos;
+        }
+
+        if (in->pos >= in->end) {
+            return false;
+        } else if (*in->pos == '(') {
+            *token = TOKEN_OPEN_PAREN;
+            ++in->pos;
+            return true;
+        } else if (*in->pos == ')') {
+            *token =  TOKEN_CLOSE_PAREN;
+            ++in->pos;
+            return true;
+        } else if (isdigit(*in->pos)) {
+            /* TODO: lex number */
+            *token = TOKEN_NUMBER;
+            while ((isdigit(*in->pos) || *in->pos == '.') && in->pos < in->end) {
+                ++in->pos;
+            }
+            if (in->pos >= in->end) {
+                return false;
+            }
+            return true;
+        } else if (*in->pos == '"') {
+            /* TODO: lex string */
+            * token = TOKEN_STRING;
+            /* return true; */
+            return false;
+        } else {
+            *token = TOKEN_IDENT;
+            ++in->pos;
+            return true;
+        }
+    }
 }

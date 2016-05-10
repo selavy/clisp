@@ -3,7 +3,7 @@ CFLAGS=-Wall -Werror -g
 RE2C=re2c
 #OBJS=first.o
 #TARGET=first
-OBJS=lexer.o main.o
+OBJS=lexer.o main.o token.o
 TARGET=clisp
 
 all: $(TARGET)
@@ -14,6 +14,8 @@ main.o: main.c
 	$(CC) $(CFLAGS) -c main.c
 lexer.o: lexer.c lexer.h token.h
 	$(CC) $(CFLAGS) -c lexer.c
+token.o: token.h token.c
+	$(CC) $(CFLAGS) -c token.c
 #first.o: first.c
 #	$(CC) $(CFLAGS) -c first.c
 #first.c: first.re
