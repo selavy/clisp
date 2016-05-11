@@ -16,14 +16,14 @@ void check_case(const char *stream, const int *expected, int size) {
     int tokens[100];
     int pos = 0;
     input_t input;
-    token_t token;
+    struct tok_t token;
     int i;
     assert(lexer_init(&input, stream) == true);
     while (lexer_lex(input, &token)) {
-        tokens[pos++] = token;
+        tokens[pos++] = token.type;
     }
     assert(lexer_destroy(&input) == true);
-    assert(token == TK_EOF);
+    assert(token.type == TK_EOF);
     /*
     printf("Pos = %d, size = %d\n", pos, size);
     PRINTL(tokens, pos);

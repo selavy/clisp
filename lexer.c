@@ -32,10 +32,10 @@ bool lexer_destroy(input_t *input) {
     return true;
 }
 
-bool lexer_lex(input_t input, token_t *token) {
+bool lexer_lex(input_t input, struct tok_t *token) {
     struct _input_t *in = (struct _input_t*)input;
     if (in->pos >= in->end) {
-        *token = TK_EOF;
+        token->type = TK_EOF;
         return false;
     } else {
         while (in->pos < in->end && isspace(*in->pos)) {
@@ -45,15 +45,15 @@ bool lexer_lex(input_t input, token_t *token) {
         if (in->pos >= in->end) {
             return false;
         } else if (*in->pos == '(') {
-            *token = TK_LPAREN;
+            token->type = TK_LPAREN;
             ++in->pos;
             return true;
         } else if (*in->pos == ')') {
-            *token =  TK_RPAREN;
+            token->type = TK_RPAREN;
             ++in->pos;
             return true;
         } else if (isdigit(*in->pos)) {
-            *token = TK_NUMBER;
+            token->type = TK_NUMBER;
             ++in->pos;
             while (in->pos < in->end) {
                 if (!isdigit(*in->pos) && *in->pos != '.') {
@@ -63,7 +63,7 @@ bool lexer_lex(input_t input, token_t *token) {
             }
             return false;
         } else if (*in->pos == '"') {
-            *token = TK_STRING;
+            token->type = TK_STRING;
             ++in->pos;
             while (in->pos < in->end) {
                 if (*in->pos == '"') {
@@ -74,7 +74,7 @@ bool lexer_lex(input_t input, token_t *token) {
             }
             return false;
         } else {
-            *token = TK_IDENT;
+            token->type = TK_IDENT;
             ++in->pos;
             while (in->pos < in->end) {
                 if (isspace(*in->pos) || *in->pos == '"') {
