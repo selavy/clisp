@@ -4,7 +4,7 @@
 #include "lexer.h"
 
 int main(int argc, char **argv) {
-    const char *stream = "( 1 + 2 )";
+    const char *stream = "( print \"Hello\" )";
 
     printf("stream: '%s'\n", stream);
 

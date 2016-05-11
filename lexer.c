@@ -39,11 +39,12 @@ bool lexer_lex(input_t input, token_t *token) {
         *token = TOKEN_EOF;
         return false;
     } else {
-        while (isspace(*in->pos) && in->pos < in->end) {
+        while (in->pos < in->end && isspace(*in->pos)) {
             ++in->pos;
         }
 
         if (in->pos >= in->end) {
+            printf("unexpected end!\n");
             return false;
         } else if (*in->pos == '(') {
             *token = TOKEN_OPEN_PAREN;
@@ -54,7 +55,6 @@ bool lexer_lex(input_t input, token_t *token) {
             ++in->pos;
             return true;
         } else if (isdigit(*in->pos)) {
-            /* TODO: lex number */
             *token = TOKEN_NUMBER;
             while ((isdigit(*in->pos) || *in->pos == '.') && in->pos < in->end) {
                 ++in->pos;
@@ -64,14 +64,27 @@ bool lexer_lex(input_t input, token_t *token) {
             }
             return true;
         } else if (*in->pos == '"') {
-            /* TODO: lex string */
-            * token = TOKEN_STRING;
-            /* return true; */
-            return false;
+            ++in->pos;
+            *token = TOKEN_STRING;
+            while (in->pos < in->end && *in->pos != '"') {
+                ++in->pos;
+            }
+            if (*in->pos == '"') {
+                ++in->pos;
+                return true;
+            } else {
+                return false;
+            }
         } else {
             *token = TOKEN_IDENT;
             ++in->pos;
-            return true;
+            while (in->pos < in->end) {
+                ++in->pos;
+                if (isspace(*in->pos) || *in->pos == '"') {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
