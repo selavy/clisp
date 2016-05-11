@@ -5,21 +5,26 @@ RE2C=re2c
 #TARGET=first
 OBJS=lexer.o main.o token.o
 TARGET=clisp
+LEMON=lemon
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
+$(TARGET): $(LEMON) $(OBJS)
 	$(CC) -o $(TARGET) $(CFLAGS) $(OBJS)
+$(LEMON): lemon.c
+	$(CC) $< -o $@
 main.o: main.c
-	$(CC) $(CFLAGS) -c main.c
-lexer.o: lexer.c lexer.h token.h
-	$(CC) $(CFLAGS) -c lexer.c
-token.o: token.h token.c
-	$(CC) $(CFLAGS) -c token.c
+	$(CC) $(CFLAGS) -c $< -o $@
+%.o: %.c %.h
+	$(CC) -o $@ $(CFLAGS) -c $<
+#lexer.o: lexer.c lexer.h
+#	$(CC) $(CFLAGS) -c $< -o $@
+#token.o: token.h token.c
+#	$(CC) $(CFLAGS) -c $< -o $@
 #first.o: first.c
 #	$(CC) $(CFLAGS) -c first.c
 #first.c: first.re
 #	$(RE2C) -o first.c first.re
 .PHONY: clean
 clean:
-	rm -rf $(OBJS) first.c $(TARGET)
+	rm -rf $(OBJS) first.c $(TARGET) $(LEMON)
