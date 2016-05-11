@@ -17,4 +17,4 @@ $(LEMON): lemon.c
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJS) $(TARGET) $(LEMON) parse.h parse.c
+	rm -rf $(OBJS) $(TARGET) $(LEMON) parse.h parse.c parse.out

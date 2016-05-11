@@ -5,16 +5,16 @@
 
 /* The type of the data attached to each token is Token.  This is also the */
 /* default type for non-terminals. */
-%token_type {Token}
-%default_type {Token}
+%token_type {token_t}
+%default_type {token_t}
 
 /* The following text is included near the beginning of the C source
  * code file that implements the parser.
 */
 %include {
 
-/* The generated parser function takes a 4th argument as follows: */
-%extra_argument {Parse *pParse}
+#include <assert.h>
+#include "token.h"
 
 /* Disable all error recovery processing in the parser push-down automaton. */
 #define YYNOERRORRECOVERY 1
