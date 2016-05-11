@@ -35,7 +35,6 @@ bool lexer_destroy(input_t *input) {
 bool lexer_lex(input_t input, token_t *token) {
     struct _input_t *in = (struct _input_t*)input;
     if (in->pos >= in->end) {
-        printf("END DETECTED\n");
         *token = TOKEN_EOF;
         return false;
     } else {
@@ -44,7 +43,6 @@ bool lexer_lex(input_t input, token_t *token) {
         }
 
         if (in->pos >= in->end) {
-            printf("unexpected end!\n");
             return false;
         } else if (*in->pos == '(') {
             *token = TOKEN_OPEN_PAREN;
@@ -56,33 +54,33 @@ bool lexer_lex(input_t input, token_t *token) {
             return true;
         } else if (isdigit(*in->pos)) {
             *token = TOKEN_NUMBER;
-            while ((isdigit(*in->pos) || *in->pos == '.') && in->pos < in->end) {
-                ++in->pos;
-            }
-            if (in->pos >= in->end) {
-                return false;
-            }
-            return true;
-        } else if (*in->pos == '"') {
             ++in->pos;
+            while (in->pos < in->end) {
+                if (!isdigit(*in->pos) && *in->pos != '.') {
+                    return true;
+                }
+                ++in->pos;
+            }
+            return false;
+        } else if (*in->pos == '"') {
             *token = TOKEN_STRING;
-            while (in->pos < in->end && *in->pos != '"') {
+            ++in->pos;
+            while (in->pos < in->end) {
+                if (*in->pos == '"') {
+                    ++in->pos;
+                    return true;
+                }
                 ++in->pos;
             }
-            if (*in->pos == '"') {
-                ++in->pos;
-                return true;
-            } else {
-                return false;
-            }
+            return false;
         } else {
             *token = TOKEN_IDENT;
             ++in->pos;
             while (in->pos < in->end) {
-                ++in->pos;
                 if (isspace(*in->pos) || *in->pos == '"') {
                     return true;
                 }
+                ++in->pos;
             }
             return false;
         }
