@@ -1,6 +1,6 @@
 #include "token.h"
 
-const char* token_print(int token) {
+const char* token_print(token_t token) {
     switch (token) {
     case TOKEN_IDENT:
         return "IDENT";
