@@ -23,7 +23,7 @@ void check_case(const char *stream, const int *expected, int size) {
         tokens[pos++] = token;
     }
     assert(lexer_destroy(&input) == true);
-    assert(token == TOKEN_EOF);
+    assert(token == TK_EOF);
     /*
     printf("Pos = %d, size = %d\n", pos, size);
     PRINTL(tokens, pos);
@@ -37,37 +37,37 @@ void check_case(const char *stream, const int *expected, int size) {
 int main(int argc, char **argv) {
     {
         const int expected[] = {
-            TOKEN_OPEN_PAREN,
-            TOKEN_IDENT,
-            TOKEN_STRING,
-            TOKEN_CLOSE_PAREN
+            TK_LPAREN,
+            TK_IDENT,
+            TK_STRING,
+            TK_RPAREN
         };
         check_case("(print \"Hello\")", &expected[0], NELEMS(expected));
         printf("Passed Case 1\n");
     }
     {
         const int expected[] = {
-            TOKEN_OPEN_PAREN,
-            TOKEN_IDENT,
-            TOKEN_NUMBER,
-            TOKEN_NUMBER,
-            TOKEN_CLOSE_PAREN
+            TK_LPAREN,
+            TK_IDENT,
+            TK_NUMBER,
+            TK_NUMBER,
+            TK_RPAREN
         };
         check_case("(+ 1 2)", &expected[0], NELEMS(expected));
         printf("Passed Case 2\n");
     }
     {
         const int expected[] = {
-            TOKEN_OPEN_PAREN,
-            TOKEN_IDENT,
-            TOKEN_NUMBER,
-            TOKEN_OPEN_PAREN,
-            TOKEN_IDENT,
-            TOKEN_NUMBER,
-            TOKEN_NUMBER,
-            TOKEN_CLOSE_PAREN,
-            TOKEN_NUMBER,
-            TOKEN_CLOSE_PAREN
+            TK_LPAREN,
+            TK_IDENT,
+            TK_NUMBER,
+            TK_LPAREN,
+            TK_IDENT,
+            TK_NUMBER,
+            TK_NUMBER,
+            TK_RPAREN,
+            TK_NUMBER,
+            TK_RPAREN
         };
         check_case("(+ 1 (+ 2 3) 4)", &expected[0], NELEMS(expected));
         printf("Passed Case 3\n");

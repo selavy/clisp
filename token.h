@@ -2,12 +2,12 @@
 #define TOKEN__H_
 
 enum {
-    TOKEN_IDENT = 0,
-    TOKEN_NUMBER,
-    TOKEN_STRING,
-    TOKEN_OPEN_PAREN,
-    TOKEN_CLOSE_PAREN,
-    TOKEN_EOF
+    TK_IDENT,
+    TK_NUMBER,
+    TK_STRING,
+    TK_LPAREN,
+    TK_RPAREN,
+    TK_EOF
 };
 
 typedef unsigned char token_t;

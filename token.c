@@ -2,17 +2,17 @@
 
 const char* token_print(token_t token) {
     switch (token) {
-    case TOKEN_IDENT:
+    case TK_IDENT:
         return "IDENT";
-    case TOKEN_NUMBER:
+    case TK_NUMBER:
         return "NUMBER";
-    case TOKEN_STRING:
+    case TK_STRING:
         return "STRING";
-    case TOKEN_OPEN_PAREN:
-        return "OPEN_PAREN";
-    case TOKEN_CLOSE_PAREN:
-        return "CLOSE_PAREN";
-    case TOKEN_EOF:
+    case TK_LPAREN:
+        return "LPAREN";
+    case TK_RPAREN:
+        return "TK_RPAREN";
+    case TK_EOF:
         return "EOF";
     default:
         return "UNKNOWN";
