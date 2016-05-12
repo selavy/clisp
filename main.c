@@ -73,8 +73,18 @@ int main(int argc, char **argv) {
         check_case("(+ 1 (+ 2 3) 4)", &expected[0], NELEMS(expected));
         printf("Passed Case 3\n");
     }
+    {
+        const int expected[] = { TK_NUMBER };
+        check_case("123", &expected[0], NELEMS(expected));
+        printf("Passed Case 4\n");
+    }
+    {
+        const int expected[] = { TK_STRING };
+        check_case("\"Hello World\"", &expected[0], NELEMS(expected));
+        printf("Passed Case 5\n");
+    }
 
-    const char *stream = "(+ 1 2)";
+    const char *stream = "123";
     lexer_t lexer;
     parser_t parser;
     assert(lexer_init(&lexer, stream) == 0);
@@ -82,10 +92,14 @@ int main(int argc, char **argv) {
 
     struct token_t token;
     while (lexer_lex(lexer, &token) == 0) {
+        printf("Token: %s\n", token_print(token.type));
         assert(parser_parse(parser, &token) == 0);
     }
+
+    assert(token.type = TK_EOF);
     assert(lexer_destroy(&lexer) == 0);
     assert(parser_destroy(&parser) == 0);
+    printf("Passed Case 6\n");
 
     printf("Passed\n");
     return 0;

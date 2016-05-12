@@ -61,7 +61,8 @@ int lexer_lex(lexer_t lexer, struct token_t *token) {
                 }
                 ++in->pos;
             }
-            return 1;
+            token->end = in->pos;
+            return 0;
         } else if (*in->pos == '"') {
             token->type = TK_STRING;
             token->beg = in->pos++;
