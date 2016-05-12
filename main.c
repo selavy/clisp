@@ -121,9 +121,19 @@ int main(int argc, char **argv) {
         check_lexer_case("'(4 5)", &expected[0], NELEMS(expected));
     }
 
-    check_term_parser_case("123", OBJ_NUMBER);
-    check_term_parser_case("1", OBJ_NUMBER);
-    check_term_parser_case("\"Hello\"", OBJ_STRING);
+    //check_term_parser_case("123", OBJ_NUMBER);
+    //check_term_parser_case("1", OBJ_NUMBER);
+    //check_term_parser_case("\"Hello\"", OBJ_STRING);
+
+    const char *stream = "123";
+    psr_t parser;
+    assert(psr_init(&parser, stream) == 0);
+    struct object_t root;
+    assert(psr_parse(parser, &root) == 0);
+    object_debug_print(&root);
+    assert(root.type == OBJ_NUMBER);
+    assert(root.val == 123.);
+    assert(psr_destroy(&parser) == 0);
 
     printf("\nPassed %d test cases.\n", casenum);
     return 0;

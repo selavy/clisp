@@ -3,8 +3,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <assert.h>
 #include "token.h"
 #include "object.h"
+#include "lexer.h"
 
 #define STACK_SZ 100
 
@@ -119,5 +121,70 @@ int parser_destroy(parser_t *parser) {
     struct state_t *state = (struct state_t*)*parser;
     free(state);
     *parser = 0;
+    return 0;
+}
+
+struct _psr_t {
+   lexer_t lexer; 
+   struct token_t token;
+};
+int psr_init(psr_t *psr, const char *stream) {
+    struct _psr_t *p = malloc(sizeof(*p));
+    if (!p)
+        return 1;
+    if (lexer_init(&p->lexer, stream) != 0) {
+        free(p);
+        return 1;
+    }
+    *psr = p;
+    return 0;
+}
+
+int psr_term(struct _psr_t *psr, struct object_t **ret) {
+    struct object_t *obj; // for convienence
+    int val;
+    switch (psr->token.type) {
+        case TK_NUMBER:
+            val = parse_int(psr->token.beg, psr->token.end);
+            obj = malloc(sizeof(*obj));
+            if (object_create_number(val, obj) != 0) {
+                free(obj);
+                return 1;
+            }
+            *ret = obj;
+            break;
+        case TK_STRING:
+            obj = malloc(sizeof(*obj));
+            if (object_create_string(psr->token.beg, psr->token.end, obj) != 0) {
+                free(obj);
+                return 1;
+            }
+            *ret = obj;
+            break;
+        case TK_IDENT:
+            assert(0); // TODO: implement
+            break;
+        default:
+            assert(0); // TODO: error handling
+            return 1;
+    }
+    return 0;
+}
+
+int psr_parse(psr_t psr, struct object_t *root) {
+    struct _psr_t *p = (struct _psr_t*)psr;
+    if (lexer_lex(p->lexer, &p->token) != 0) { // prime first token
+        return 1;
+    }
+    return psr_term(p, &root);
+}
+
+int psr_destroy(psr_t *psr) {
+    if (!*psr)
+        return 0;
+    struct _psr_t *p = (struct _psr_t*)*psr;
+    lexer_destroy(&p->lexer);
+    free(p);
+    *psr = 0;
     return 0;
 }
