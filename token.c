@@ -14,6 +14,8 @@ const char* token_print(token_type_t token) {
         return "TK_RPAREN";
     case TK_EOF:
         return "EOF";
+    case TK_QUOTE:
+        return "QUOTE";
     default:
         return "UNKNOWN";
     }

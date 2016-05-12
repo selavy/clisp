@@ -6,6 +6,7 @@ enum {
     OBJ_NUMBER,
     OBJ_STRING,
     OBJ_FUNCTION,
+    OBJ_CONS,
     OBJ_LIST
 };
 
@@ -16,11 +17,14 @@ struct object_t {
     union {
         void *ptr;
         double val;
+
     };
 };
 
 int object_create_number(double val, struct object_t *object);
 int object_create_string(const char *beg, const char *end, struct object_t *object);
+int object_create_cons(struct object_t *car, struct object_t *cdr, struct object_t *object);
+int object_destroy(struct object_t **object);
 void object_debug_print(struct object_t *obj);
 
 #endif // OBJECT__H_

@@ -5,6 +5,15 @@
 #include <string.h>
 #include <assert.h>
 
+struct string_t {
+    char *str;
+    size_t len;
+};
+struct cons_t {
+    struct object_t *car;
+    struct object_t *cdr;
+};
+
 int object_create_number(double val, struct object_t *object) {
     printf("OBJECT creating number with value: %f\n", val);
     object->type = OBJ_NUMBER;
@@ -12,10 +21,6 @@ int object_create_number(double val, struct object_t *object) {
     return 0;
 }
 
-struct string_t {
-    char *str;
-    size_t len;
-};
 int object_create_string(const char* beg, const char *end, struct object_t *object) {
     assert(beg <= end);
     struct string_t *s = malloc(sizeof(*s));
@@ -43,6 +48,74 @@ const char* print_string(struct string_t *s) {
     } else {
         return s->str;
     }
+}
+
+int
+object_create_cons(struct object_t *car, struct object_t *cdr, struct object_t *object) {
+    assert(car != 0); // required?
+    struct cons_t *cons = malloc(sizeof(*cons));
+    if (!cons)
+        return 1;
+    cons->car = car;
+    cons->cdr = cdr;
+    object->type = OBJ_CONS; 
+    object->ptr = cons;
+    return 0;
+}
+
+void object_string_destroy(struct object_t *obj) {
+    struct string_t *str = (struct string_t*)obj->ptr;
+    if (str->len > 0) {
+        free(str->str);
+    }
+    free(str);
+    obj->ptr = 0;
+    free(obj);
+}
+
+void object_cons_destroy(struct object_t *obj) {
+    struct cons_t *cons = (struct cons_t*)obj->ptr;
+    if (cons->car) {
+        object_destroy(&(cons->car));
+        cons->car = 0;
+    }
+    if (cons->cdr) {
+        object_destroy(&(cons->cdr));
+        cons->cdr = 0;
+    }
+    free(cons);
+    obj->ptr = 0;
+    free(obj);
+}
+
+int object_destroy(struct object_t **object) {
+    if (!*object)
+        return 0;
+    struct object_t *obj = *object;
+    switch (obj->type) {
+        case OBJ_VOID:
+            break;
+        case OBJ_NUMBER:
+            free(obj);
+            *object = 0;
+            break;
+        case OBJ_STRING:
+            object_string_destroy(obj);
+            *object = 0;
+            break;
+        case OBJ_FUNCTION:
+            break;
+        case OBJ_CONS:
+            object_cons_destroy(obj);
+            *object = 0;
+            break;
+        case OBJ_LIST:
+            break;
+        default:
+            assert(0);
+            break;
+    }
+    return 0;
 }
 
 void object_debug_print(struct object_t *obj) {

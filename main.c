@@ -13,6 +13,8 @@
             printf("%s\n", token_print(x[i])); \
         } \
     } while(0)
+static int casenum = 1;
+#define PASSED() printf("Passed Test Case #%d\n", casenum++)
 
 void check_lexer_case(const char *stream, const int *expected, int size) {
     int tokens[100];
@@ -34,6 +36,8 @@ void check_lexer_case(const char *stream, const int *expected, int size) {
     for (i = 0; i < size; ++i) {
         assert(tokens[i] == expected[i]);
     }
+
+    PASSED();
 }
 
 void check_term_parser_case(const char *stream, object_type_t type) {
@@ -59,6 +63,8 @@ void check_term_parser_case(const char *stream, object_type_t type) {
 
     assert(lexer_destroy(&lexer) == 0);
     assert(parser_destroy(&parser) == 0);
+
+    PASSED();
 }
 
 int main(int argc, char **argv) {
@@ -70,7 +76,6 @@ int main(int argc, char **argv) {
             TK_RPAREN
         };
         check_lexer_case("(print \"Hello\")", &expected[0], NELEMS(expected));
-        printf("Passed Case 1\n");
     }
     {
         const int expected[] = {
@@ -81,7 +86,6 @@ int main(int argc, char **argv) {
             TK_RPAREN
         };
         check_lexer_case("(+ 1 2)", &expected[0], NELEMS(expected));
-        printf("Passed Case 2\n");
     }
     {
         const int expected[] = {
@@ -97,25 +101,29 @@ int main(int argc, char **argv) {
             TK_RPAREN
         };
         check_lexer_case("(+ 1 (+ 2 3) 4)", &expected[0], NELEMS(expected));
-        printf("Passed Case 3\n");
     }
     {
         const int expected[] = { TK_NUMBER };
         check_lexer_case("123", &expected[0], NELEMS(expected));
-        printf("Passed Case 4\n");
     }
     {
         const int expected[] = { TK_STRING };
         check_lexer_case("\"Hello World\"", &expected[0], NELEMS(expected));
-        printf("Passed Case 5\n");
+    }
+    {
+        const int expected[] = {
+            TK_QUOTE,
+            TK_LPAREN,
+            TK_NUMBER,
+            TK_NUMBER,
+            TK_RPAREN
+        };
+        check_lexer_case("'(4 5)", &expected[0], NELEMS(expected));
     }
 
     check_term_parser_case("123", OBJ_NUMBER);
-    printf("Passed Case 6\n");
     check_term_parser_case("1", OBJ_NUMBER);
-    printf("Passed Case 7\n");
     check_term_parser_case("\"Hello\"", OBJ_STRING);
-    printf("Passed Case 7\n");
 
     printf("Passed\n");
     return 0;

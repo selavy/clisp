@@ -51,6 +51,10 @@ int lexer_lex(lexer_t lexer, struct token_t *token) {
             token->type = TK_RPAREN;
             ++in->pos;
             return 0;
+        } else if (*in->pos == '\'') {
+            token->type = TK_QUOTE;
+            ++in->pos;
+            return 0;
         } else if (isdigit(*in->pos)) {
             token->type = TK_NUMBER;
             token->beg = in->pos++;

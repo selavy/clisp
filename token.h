@@ -7,6 +7,7 @@ enum {
     TK_STRING,
     TK_LPAREN,
     TK_RPAREN,
+    TK_QUOTE,
     TK_EOF
 };
 
