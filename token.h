@@ -16,11 +16,11 @@ typedef unsigned char token_type_t;
 // 
 // maybe best to do
 //struct token_t {
-//    int64_t type; //  8 bytes
-//    int beg;      //  4 bytes
-//    int end;      //  4 bytes
-//                  //  -------
-//                  // 16 bytes
+//    int         type; //  4 bytes
+//    const char *beg;  //  8 bytes
+//    int         end;  //  4 bytes
+//                      //  -------
+//                      // 16 bytes
 //};
 struct token_t {
     token_type_t type; // 1 byte
