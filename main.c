@@ -14,7 +14,7 @@
         } \
     } while(0)
 
-void check_case(const char *stream, const int *expected, int size) {
+void check_lexer_case(const char *stream, const int *expected, int size) {
     int tokens[100];
     int pos = 0;
     lexer_t lexer;
@@ -36,6 +36,30 @@ void check_case(const char *stream, const int *expected, int size) {
     }
 }
 
+void check_term_parser_case(const char *stream, object_type_t type) {
+    lexer_t lexer;
+    parser_t parser;
+    assert(lexer_init(&lexer, stream) == 0);
+    assert(parser_init(&parser) == 0);
+
+    struct token_t token;
+    while (lexer_lex(lexer, &token) == 0) {
+        // printf("Token: %s\n", token_print(token.type));
+        assert(parser_parse(parser, &token) == 0);
+    }
+
+    assert(token.type = TK_EOF);
+    assert(parser_parse(parser, &token) == 0); // let parser know stream has ended
+
+    ast_t ast;
+    assert(parser_get_ast(parser, &ast) == 0);
+    struct object_t *root = (struct object_t*)ast;
+    assert(root->type == type);
+
+    assert(lexer_destroy(&lexer) == 0);
+    assert(parser_destroy(&parser) == 0);
+}
+
 int main(int argc, char **argv) {
     {
         const int expected[] = {
@@ -44,7 +68,7 @@ int main(int argc, char **argv) {
             TK_STRING,
             TK_RPAREN
         };
-        check_case("(print \"Hello\")", &expected[0], NELEMS(expected));
+        check_lexer_case("(print \"Hello\")", &expected[0], NELEMS(expected));
         printf("Passed Case 1\n");
     }
     {
@@ -55,7 +79,7 @@ int main(int argc, char **argv) {
             TK_NUMBER,
             TK_RPAREN
         };
-        check_case("(+ 1 2)", &expected[0], NELEMS(expected));
+        check_lexer_case("(+ 1 2)", &expected[0], NELEMS(expected));
         printf("Passed Case 2\n");
     }
     {
@@ -71,42 +95,21 @@ int main(int argc, char **argv) {
             TK_NUMBER,
             TK_RPAREN
         };
-        check_case("(+ 1 (+ 2 3) 4)", &expected[0], NELEMS(expected));
+        check_lexer_case("(+ 1 (+ 2 3) 4)", &expected[0], NELEMS(expected));
         printf("Passed Case 3\n");
     }
     {
         const int expected[] = { TK_NUMBER };
-        check_case("123", &expected[0], NELEMS(expected));
+        check_lexer_case("123", &expected[0], NELEMS(expected));
         printf("Passed Case 4\n");
     }
     {
         const int expected[] = { TK_STRING };
-        check_case("\"Hello World\"", &expected[0], NELEMS(expected));
+        check_lexer_case("\"Hello World\"", &expected[0], NELEMS(expected));
         printf("Passed Case 5\n");
     }
 
-    const char *stream = "123";
-    lexer_t lexer;
-    parser_t parser;
-    assert(lexer_init(&lexer, stream) == 0);
-    assert(parser_init(&parser) == 0);
-
-    struct token_t token;
-    while (lexer_lex(lexer, &token) == 0) {
-        printf("Token: %s\n", token_print(token.type));
-        assert(parser_parse(parser, &token) == 0);
-    }
-
-    assert(token.type = TK_EOF);
-    assert(parser_parse(parser, &token) == 0); // let parser know stream has ended
-
-    ast_t ast;
-    assert(parser_get_ast(parser, &ast) == 0);
-    struct object_t *root = (struct object_t*)ast;
-    assert(root->type == OBJ_NUMBER);
-
-    assert(lexer_destroy(&lexer) == 0);
-    assert(parser_destroy(&parser) == 0);
+    check_term_parser_case("123", OBJ_NUMBER);
     printf("Passed Case 6\n");
 
     printf("Passed\n");
