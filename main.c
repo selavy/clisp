@@ -41,29 +41,13 @@ void check_lexer_case(const char *stream, const int *expected, int size) {
 }
 
 void check_term_parser_case(const char *stream, object_type_t type) {
-    lexer_t lexer;
-    parser_t parser;
-    assert(lexer_init(&lexer, stream) == 0);
-    assert(parser_init(&parser) == 0);
-
-    struct token_t token;
-    while (lexer_lex(lexer, &token) == 0) {
-        // printf("Token: %s\n", token_print(token.type));
-        assert(parser_parse(parser, &token) == 0);
-    }
-
-    assert(token.type = TK_EOF);
-    assert(parser_parse(parser, &token) == 0); // let parser know stream has ended
-
-    ast_t ast;
-    assert(parser_get_ast(parser, &ast) == 0);
-    struct object_t *root = (struct object_t*)ast;
-    assert(root->type == type);
-    printf("Root object: "); object_debug_print(root);
-
-    assert(lexer_destroy(&lexer) == 0);
-    assert(parser_destroy(&parser) == 0);
-
+    psr_t parser;
+    assert(psr_init(&parser, stream) == 0);
+    struct object_t root;
+    assert(psr_parse(parser, &root) == 0);
+    printf("main: "); object_debug_print(&root);
+    assert(root.type == OBJ_NUMBER);
+    assert(psr_destroy(&parser) == 0);
     PASSED();
 }
 
@@ -121,19 +105,16 @@ int main(int argc, char **argv) {
         check_lexer_case("'(4 5)", &expected[0], NELEMS(expected));
     }
 
-    //check_term_parser_case("123", OBJ_NUMBER);
-    //check_term_parser_case("1", OBJ_NUMBER);
-    //check_term_parser_case("\"Hello\"", OBJ_STRING);
-
-    const char *stream = "123";
-    psr_t parser;
-    assert(psr_init(&parser, stream) == 0);
-    struct object_t root;
-    assert(psr_parse(parser, &root) == 0);
-    printf("main: "); object_debug_print(&root);
-    assert(root.type == OBJ_NUMBER);
-    assert(root.val == 123.);
-    assert(psr_destroy(&parser) == 0);
+   // const char *stream = "123";
+   // psr_t parser;
+   // assert(psr_init(&parser, stream) == 0);
+   // struct object_t root;
+   // assert(psr_parse(parser, &root) == 0);
+   // printf("main: "); object_debug_print(&root);
+   // assert(root.type == OBJ_NUMBER);
+   // assert(root.val == 123.);
+   // assert(psr_destroy(&parser) == 0);
+    check_term_parser_case("123", OBJ_NUMBER);
 
     printf("\nPassed %d test cases.\n", casenum);
     return 0;
