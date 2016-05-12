@@ -13,7 +13,12 @@ typedef unsigned char object_type_t;
 
 struct object_t {
     object_type_t type;
-    void *data;
+    union {
+        void *ptr;
+        double val;
+    };
 };
+
+int object_create_number(double val, struct object_t *object);
 
 #endif // OBJECT__H_

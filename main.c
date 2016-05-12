@@ -4,6 +4,7 @@
 #include "token.h"
 #include "lexer.h"
 #include "parser.h"
+#include "object.h"
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0]))
 #define PRINTL(x, size) \
@@ -97,6 +98,13 @@ int main(int argc, char **argv) {
     }
 
     assert(token.type = TK_EOF);
+    assert(parser_parse(parser, &token) == 0); // let parser know stream has ended
+
+    ast_t ast;
+    assert(parser_get_ast(parser, &ast) == 0);
+    struct object_t *root = (struct object_t*)ast;
+    assert(root->type == OBJ_NUMBER);
+
     assert(lexer_destroy(&lexer) == 0);
     assert(parser_destroy(&parser) == 0);
     printf("Passed Case 6\n");
