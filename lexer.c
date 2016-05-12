@@ -4,85 +4,84 @@
 #include <ctype.h>
 #include <stdio.h>
 
-struct _input_t {
+struct _lexer_t {
     char *stream;
     const char *pos;
     const char *end;
 };
 
-bool lexer_init(lexer_t *lexer, const char *stream) {
-    struct _input_t *in = malloc(sizeof(*in));
+int lexer_init(lexer_t *lexer, const char *stream) {
+    struct _lexer_t *lex = malloc(sizeof(*lex));
     const size_t size = strlen(stream);
-    in->stream = malloc(size * sizeof(char));
-    strncpy(in->stream, stream, size);
-    in->pos = in->stream;
-    in->end = in->pos + size;
-    *lexer = (void*)in;
-
-    return true;
+    lex->stream = malloc(size * sizeof(char));
+    strncpy(lex->stream, stream, size);
+    lex->pos = lex->stream;
+    lex->end = lex->pos + size;
+    *lexer = (void*)lex;
+    return 0;
 }
 
-bool lexer_destroy(lexer_t *lexer) {
+int lexer_destroy(lexer_t *lexer) {
     if (!*lexer)
-        return true;
-    struct _input_t *in = (struct _input_t*)*lexer;
+        return 0;
+    struct _lexer_t *in = (struct _lexer_t*)*lexer;
     free(in->stream);
     free(in);
     *lexer = 0;
-    return true;
+    return 0;
 }
 
-bool lexer_lex(lexer_t lexer, struct token_t *token) {
-    struct _input_t *in = (struct _input_t*)lexer;
+int lexer_lex(lexer_t lexer, struct token_t *token) {
+    struct _lexer_t *in = (struct _lexer_t*)lexer;
     if (in->pos >= in->end) {
         token->type = TK_EOF;
-        return false;
+        return 1;
     } else {
         while (in->pos < in->end && isspace(*in->pos)) {
             ++in->pos;
         }
 
         if (in->pos >= in->end) {
-            return false;
+            return 1;
         } else if (*in->pos == '(') {
             token->type = TK_LPAREN;
             ++in->pos;
-            return true;
+            return 0;
         } else if (*in->pos == ')') {
             token->type = TK_RPAREN;
             ++in->pos;
-            return true;
+            return 0;
         } else if (isdigit(*in->pos)) {
             token->type = TK_NUMBER;
             ++in->pos;
             while (in->pos < in->end) {
                 if (!isdigit(*in->pos) && *in->pos != '.') {
-                    return true;
+                    return 0;
                 }
                 ++in->pos;
             }
-            return false;
+            return 1;
         } else if (*in->pos == '"') {
             token->type = TK_STRING;
             ++in->pos;
             while (in->pos < in->end) {
                 if (*in->pos == '"') {
                     ++in->pos;
-                    return true;
+                    return 0;
                 }
                 ++in->pos;
             }
-            return false;
+            return 1;
         } else {
             token->type = TK_IDENT;
             ++in->pos;
             while (in->pos < in->end) {
                 if (isspace(*in->pos) || *in->pos == '"') {
-                    return true;
+                    return 0;
                 }
                 ++in->pos;
             }
-            return false;
+            return 1;
         }
     }
 }

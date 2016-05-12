@@ -19,11 +19,11 @@ void check_case(const char *stream, const int *expected, int size) {
     lexer_t lexer;
     struct token_t token;
     int i;
-    assert(lexer_init(&lexer, stream) == true);
-    while (lexer_lex(lexer, &token)) {
+    assert(lexer_init(&lexer, stream) == 0);
+    while (lexer_lex(lexer, &token) == 0) {
         tokens[pos++] = token.type;
     }
-    assert(lexer_destroy(&lexer) == true);
+    assert(lexer_destroy(&lexer) == 0);
     assert(token.type == TK_EOF);
     /*
     printf("Pos = %d, size = %d\n", pos, size);
@@ -76,12 +76,12 @@ int main(int argc, char **argv) {
 
     const char *stream = "(+ 1 2)";
     lexer_t lexer;
-    assert(lexer_init(&lexer, stream));
+    assert(lexer_init(&lexer, stream) == 0);
     struct token_t token;
-    while (lexer_lex(lexer, &token)) {
+    while (lexer_lex(lexer, &token) == 0) {
         assert(parse(&token) == 0);
     }
-    assert(lexer_destroy(&lexer));
+    assert(lexer_destroy(&lexer) == 0);
 
     printf("Passed\n");
     return 0;
