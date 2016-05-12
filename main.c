@@ -130,7 +130,7 @@ int main(int argc, char **argv) {
     assert(psr_init(&parser, stream) == 0);
     struct object_t root;
     assert(psr_parse(parser, &root) == 0);
-    object_debug_print(&root);
+    printf("main: "); object_debug_print(&root);
     assert(root.type == OBJ_NUMBER);
     assert(root.val == 123.);
     assert(psr_destroy(&parser) == 0);
