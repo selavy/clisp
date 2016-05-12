@@ -46,19 +46,25 @@ int parser_init(parser_t *parser) {
 }
 
 int parse_term(struct state_t *state, struct token_t *token) {
+    struct object_t *obj;
+    int val;
     switch (token->type) {
-        case TK_NUMBER: {
-            const int val = parse_int(token->beg, token->end);
-            struct object_t *obj = malloc(sizeof(*obj));
+        case TK_NUMBER:
+            val = parse_int(token->beg, token->end);
+            obj = malloc(sizeof(*obj));
             if (object_create_number(val, obj) != 0) {
                 free(obj);
                 return 1;
             }
             state->stack[state->pos++] = obj;
             return 0;
-        }
         case TK_STRING:
-            printf("String!\n");
+            obj = malloc(sizeof(*obj));
+            if (object_create_string(token->beg, token->end, obj) != 0) {
+                free(obj);
+                return 1;
+            }
+            state->stack[state->pos++] = obj;
             return 0;
         case TK_IDENT:
             printf("Ident!\n");

@@ -111,6 +111,10 @@ int main(int argc, char **argv) {
 
     check_term_parser_case("123", OBJ_NUMBER);
     printf("Passed Case 6\n");
+    check_term_parser_case("1", OBJ_NUMBER);
+    printf("Passed Case 7\n");
+    check_term_parser_case("\"Hello\"", OBJ_STRING);
+    printf("Passed Case 7\n");
 
     printf("Passed\n");
     return 0;
