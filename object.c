@@ -15,7 +15,7 @@ struct cons_t {
 };
 
 int object_create_number(double val, struct object_t *object) {
-    printf("OBJECT creating number with value: %f\n", val);
+    /* printf("OBJECT creating number with value: %f\n", val); */ 
     object->type = OBJ_NUMBER;
     object->val = val;
     return 0;

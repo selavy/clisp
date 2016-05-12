@@ -59,7 +59,7 @@ void check_term_parser_case(const char *stream, object_type_t type) {
     assert(parser_get_ast(parser, &ast) == 0);
     struct object_t *root = (struct object_t*)ast;
     assert(root->type == type);
-    object_debug_print(root);
+    printf("Root object: "); object_debug_print(root);
 
     assert(lexer_destroy(&lexer) == 0);
     assert(parser_destroy(&parser) == 0);
@@ -125,6 +125,6 @@ int main(int argc, char **argv) {
     check_term_parser_case("1", OBJ_NUMBER);
     check_term_parser_case("\"Hello\"", OBJ_STRING);
 
-    printf("Passed\n");
+    printf("\nPassed %d test cases.\n", casenum);
     return 0;
 }
