@@ -53,9 +53,10 @@ int lexer_lex(lexer_t lexer, struct token_t *token) {
             return 0;
         } else if (isdigit(*in->pos)) {
             token->type = TK_NUMBER;
-            ++in->pos;
+            token->beg = in->pos++;
             while (in->pos < in->end) {
                 if (!isdigit(*in->pos) && *in->pos != '.') {
+                    token->end = in->pos;
                     return 0;
                 }
                 ++in->pos;
@@ -63,10 +64,10 @@ int lexer_lex(lexer_t lexer, struct token_t *token) {
             return 1;
         } else if (*in->pos == '"') {
             token->type = TK_STRING;
-            ++in->pos;
+            token->beg = in->pos++;
             while (in->pos < in->end) {
                 if (*in->pos == '"') {
-                    ++in->pos;
+                    token->end = ++in->pos;
                     return 0;
                 }
                 ++in->pos;
@@ -74,9 +75,10 @@ int lexer_lex(lexer_t lexer, struct token_t *token) {
             return 1;
         } else {
             token->type = TK_IDENT;
-            ++in->pos;
+            token->beg = in->pos++;
             while (in->pos < in->end) {
                 if (isspace(*in->pos) || *in->pos == '"') {
+                    token->end = in->pos;
                     return 0;
                 }
                 ++in->pos;
