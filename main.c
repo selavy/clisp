@@ -76,12 +76,16 @@ int main(int argc, char **argv) {
 
     const char *stream = "(+ 1 2)";
     lexer_t lexer;
+    parser_t parser;
     assert(lexer_init(&lexer, stream) == 0);
+    assert(parser_init(&parser) == 0);
+
     struct token_t token;
     while (lexer_lex(lexer, &token) == 0) {
-        assert(parse(&token) == 0);
+        assert(parser_parse(parser, &token) == 0);
     }
     assert(lexer_destroy(&lexer) == 0);
+    assert(parser_destroy(&parser) == 0);
 
     printf("Passed\n");
     return 0;
