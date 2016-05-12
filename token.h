@@ -10,8 +10,8 @@ enum {
     TK_EOF
 };
 
-typedef unsigned char token_t;
+typedef unsigned char token_type_t;
 
-const char* token_print(token_t token);
+const char* token_print(token_type_t token);
 
 #endif // TOKEN__H_

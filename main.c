@@ -16,7 +16,7 @@ void check_case(const char *stream, const int *expected, int size) {
     int tokens[100];
     int pos = 0;
     input_t input;
-    struct tok_t token;
+    struct token_t token;
     int i;
     assert(lexer_init(&input, stream) == true);
     while (lexer_lex(input, &token)) {

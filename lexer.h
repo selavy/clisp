@@ -9,11 +9,11 @@ typedef void* input_t;
 bool lexer_init(input_t *input, const char *stream);
 bool lexer_destroy(input_t *input);
 
-struct tok_t {
-    token_t type;
+struct token_t {
+    token_type_t type;
     const char* beg;
     const char* end;
 };
-bool lexer_lex(input_t input, struct tok_t *token);
+bool lexer_lex(input_t input, struct token_t *token);
 
 #endif // LEXER__H_

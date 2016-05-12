@@ -32,7 +32,7 @@ bool lexer_destroy(input_t *input) {
     return true;
 }
 
-bool lexer_lex(input_t input, struct tok_t *token) {
+bool lexer_lex(input_t input, struct token_t *token) {
     struct _input_t *in = (struct _input_t*)input;
     if (in->pos >= in->end) {
         token->type = TK_EOF;
