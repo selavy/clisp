@@ -21,5 +21,6 @@ struct object_t {
 
 int object_create_number(double val, struct object_t *object);
 int object_create_string(const char *beg, const char *end, struct object_t *object);
+void object_debug_print(struct object_t *obj);
 
 #endif // OBJECT__H_
