@@ -11,6 +11,11 @@ enum {
 };
 
 typedef unsigned char token_type_t;
+struct token_t {
+    token_type_t type;
+    const char* beg;
+    const char* end;
+};
 
 const char* token_print(token_type_t token);
 

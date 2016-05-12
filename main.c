@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "token.h"
 #include "lexer.h"
+#include "parser.h"
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0]))
 #define PRINTL(x, size) \
@@ -15,14 +16,14 @@
 void check_case(const char *stream, const int *expected, int size) {
     int tokens[100];
     int pos = 0;
-    input_t input;
+    lexer_t lexer;
     struct token_t token;
     int i;
-    assert(lexer_init(&input, stream) == true);
-    while (lexer_lex(input, &token)) {
+    assert(lexer_init(&lexer, stream) == true);
+    while (lexer_lex(lexer, &token)) {
         tokens[pos++] = token.type;
     }
-    assert(lexer_destroy(&input) == true);
+    assert(lexer_destroy(&lexer) == true);
     assert(token.type == TK_EOF);
     /*
     printf("Pos = %d, size = %d\n", pos, size);
@@ -72,6 +73,15 @@ int main(int argc, char **argv) {
         check_case("(+ 1 (+ 2 3) 4)", &expected[0], NELEMS(expected));
         printf("Passed Case 3\n");
     }
+
+    const char *stream = "(+ 1 2)";
+    lexer_t lexer;
+    assert(lexer_init(&lexer, stream));
+    struct token_t token;
+    while (lexer_lex(lexer, &token)) {
+        assert(parse(&token) == 0);
+    }
+    assert(lexer_destroy(&lexer));
 
     printf("Passed\n");
     return 0;

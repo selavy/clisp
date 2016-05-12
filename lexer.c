@@ -10,30 +10,30 @@ struct _input_t {
     const char *end;
 };
 
-bool lexer_init(input_t *input, const char *stream) {
+bool lexer_init(lexer_t *lexer, const char *stream) {
     struct _input_t *in = malloc(sizeof(*in));
     const size_t size = strlen(stream);
     in->stream = malloc(size * sizeof(char));
     strncpy(in->stream, stream, size);
     in->pos = in->stream;
     in->end = in->pos + size;
-    *input = (void*)in;
+    *lexer = (void*)in;
 
     return true;
 }
 
-bool lexer_destroy(input_t *input) {
-    if (!*input)
+bool lexer_destroy(lexer_t *lexer) {
+    if (!*lexer)
         return true;
-    struct _input_t *in = (struct _input_t*)*input;
+    struct _input_t *in = (struct _input_t*)*lexer;
     free(in->stream);
     free(in);
-    *input = 0;
+    *lexer = 0;
     return true;
 }
 
-bool lexer_lex(input_t input, struct token_t *token) {
-    struct _input_t *in = (struct _input_t*)input;
+bool lexer_lex(lexer_t lexer, struct token_t *token) {
+    struct _input_t *in = (struct _input_t*)lexer;
     if (in->pos >= in->end) {
         token->type = TK_EOF;
         return false;

@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -Werror -g
-OBJS=lexer.o main.o token.o
+OBJS=lexer.o main.o token.o parser.o
 TARGET=clisp
 LEMON=lemon
 
