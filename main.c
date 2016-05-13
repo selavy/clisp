@@ -43,10 +43,10 @@ void check_lexer_case(const char *stream, const int *expected, int size) {
 void check_term_parser_case(const char *stream, object_type_t type) {
     parser_t parser;
     assert(psr_init(&parser, stream) == 0);
-    struct object_t root;
+    object_t root;
     assert(psr_parse(parser, &root) == 0);
     printf("main: "); object_debug_print(&root);
-    assert(root.type == type);
+    assert(object_get_type(root) == type);
     assert(psr_destroy(&parser) == 0);
     PASSED();
 }

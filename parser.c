@@ -5,7 +5,6 @@
 #include <string.h>
 #include <assert.h>
 #include "token.h"
-#include "object.h"
 #include "lexer.h"
 
 int64_t parse_int(const char *beg, const char *end) {
@@ -35,22 +34,22 @@ int psr_init(parser_t *psr, const char *stream) {
     return 0;
 }
 
-int psr_term(struct _psr_t *psr, struct object_t *obj) {
+int psr_term(struct _psr_t *psr, object_t *obj) {
     int val;
     switch (psr->token.type) {
         case TK_NUMBER:
             val = parse_int(psr->token.beg, psr->token.end);
-            if (object_create_number(val, obj) != 0) {
+            *obj = object_create_number(val);
+            if (!*obj)
                 return 1;
-            }
             break;
         case TK_STRING:
-            if (object_create_string(psr->token.beg, psr->token.end, obj) != 0) {
+            *obj = object_create_string(psr->token.beg, psr->token.end);
+            if (!*obj)
                 return 1;
-            }
             break;
         case TK_IDENT:
-            assert(0); // TODO: implement
+        assert(0);
             break;
         default:
             assert(0); // TODO: error handling
@@ -60,7 +59,7 @@ int psr_term(struct _psr_t *psr, struct object_t *obj) {
     return 0;
 }
 
-int psr_parse(parser_t psr, struct object_t *root) {
+int psr_parse(parser_t psr, object_t *root) {
     struct _psr_t *p = (struct _psr_t*)psr;
     if (lexer_lex(p->lexer, &p->token) != 0) // prime first token
         return 1;
