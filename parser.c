@@ -22,7 +22,7 @@ struct _psr_t {
    lexer_t lexer; 
    struct token_t token;
 };
-int psr_init(parser_t *psr, const char *stream) {
+int parser_init(parser_t *psr, const char *stream) {
     struct _psr_t *p = malloc(sizeof(*p));
     if (!p)
         return 1;
@@ -34,7 +34,7 @@ int psr_init(parser_t *psr, const char *stream) {
     return 0;
 }
 
-int psr_term(struct _psr_t *psr, object_t *obj) {
+int parser_term(struct _psr_t *psr, object_t *obj) {
     int val;
     switch (psr->token.type) {
         case TK_NUMBER:
@@ -55,15 +55,15 @@ int psr_term(struct _psr_t *psr, object_t *obj) {
             assert(0); // TODO: error handling
             return 1;
     }
-    printf("psr_term: "); object_debug_print(obj);
+    printf("parser_term: "); object_debug_print(obj);
     return 0;
 }
 
-int psr_parse(parser_t psr, object_t *root) {
+int parser_parse(parser_t psr, object_t *root) {
     struct _psr_t *p = (struct _psr_t*)psr;
     if (lexer_lex(p->lexer, &p->token) != 0) // prime first token
         return 1;
-    if (psr_term(p, root) != 0)
+    if (parser_term(p, root) != 0)
         return 1;
     if (lexer_lex(p->lexer, &p->token) == 0) // stuff was left in the stream
         return 1;
@@ -73,7 +73,7 @@ int psr_parse(parser_t psr, object_t *root) {
     return 0;
 }
 
-int psr_destroy(parser_t *psr) {
+int parser_destroy(parser_t *psr) {
     if (!*psr)
         return 0;
     struct _psr_t *p = (struct _psr_t*)*psr;
