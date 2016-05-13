@@ -28,7 +28,7 @@ object_t object_create_string(const char *beg, const char *end) {
         str = 0;
     }
     str->type = OBJ_STRING;
-    return 0;
+    return str;
 }
 
 //int object_create_ident(const char *beg, const char *end, struct object_t **

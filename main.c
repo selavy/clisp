@@ -104,7 +104,6 @@ int main(int argc, char **argv) {
         };
         check_lexer_case("'(4 5)", &expected[0], NELEMS(expected));
     }
-
     check_term_parser_case("123", OBJ_NUMBER);
     check_term_parser_case("\"Hello World\"", OBJ_STRING);
 
