@@ -39,6 +39,8 @@ object_t object_create_string(const char *beg, const char *end);
 object_t object_create_ident(const char *beg, const char *end);
 int object_destroy(object_t object);
 void object_debug_print(object_t obj);
+const char *string_print(struct string_t *string);
+const char *ident_print(struct ident_t *ident);
 
 #define object_get_type(obj) (*(object_type_t*)obj)
 

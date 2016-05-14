@@ -112,6 +112,16 @@ int main(int argc, char **argv) {
     check_term_parser_case("\"Hello World\"", OBJ_STRING);
     check_term_parser_case("+", OBJ_IDENT);
 
+    {
+        const char *stream = "(+ 1 2)";
+        parser_t parser;
+        assert(parser_init(&parser, stream) == 0);
+        object_t root;
+        assert(parser_parse(parser, &root) == 0);
+        assert(parser_destroy(&parser) == 0);
+        PASSED();
+    }
+
     printf("\nPassed %d test cases.\n", casenum);
     return 0;
 }

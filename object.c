@@ -14,7 +14,7 @@ object_t object_create_number(double val) {
     return number;
 }
 
-// TOOD: remove double quotes around string
+// TODO: remove double quotes around string
 object_t object_create_string(const char *beg, const char *end) {
     assert(beg <= end);
     struct string_t *str = malloc(sizeof(*str));
@@ -49,14 +49,22 @@ object_t object_create_ident(const char *beg, const char *end) {
     return ident;
 }
 
-const char* print_string(struct string_t *s) {
+const char *string_print(struct string_t *s) {
     assert(s);
     assert(s->len >= 0);
-    if (s->len == 0) {
+    if (s->len == 0)
         return "";
-    } else {
+    else
         return s->str;
-    }
+}
+
+const char *ident_print(struct ident_t *ident) {
+    assert(ident);
+    assert(ident->len >= 0);
+    if (ident->len == 0)
+        return "";
+    else
+        return ident->name;
 }
 
 void object_string_destroy(struct string_t *str) {
@@ -98,23 +106,24 @@ int object_destroy(object_t obj) {
 }
 
 void object_debug_print(object_t obj) {
-//    if (!obj) {
-//        printf("NULL OBJECT\n");
-//    } else {
-//        const object_type_t type = *(object_type_t*)obj;
-//        switch (type) {
-//            case OBJ_VOID:
-//                printf("VOID\n");
-//                break;
-//            case OBJ_NUMBER:
-//                printf("Number(%f)\n", ((struct number_t*)obj)->val);
-//                break;
-//            case OBJ_STRING:
-//                printf("String(%s)\n", print_string((struct string_t*)obj));
-//                break;
-//            default:
-//                printf("UNKNOWN\n");
-//                break;
-//        }
-//    }
+    if (!obj) {
+        printf("NULL\n");
+    }
+    switch (object_get_type(obj)) {
+        case OBJ_VOID:
+            printf("VOID\n");
+            break;
+        case OBJ_NUMBER:
+            printf("NUMBER(%f)\n", ((struct number_t*)obj)->val);
+            break;
+        case OBJ_STRING:
+            printf("STRING(%s)\n", string_print(obj));
+            break;
+        case OBJ_IDENT:
+            printf("IDENT(%s)\n", ident_print(obj));
+            break;
+        default:
+            //assert(0);
+            printf("UNKNOWN TYPE(%d)\n", object_get_type(obj));
+    }
 }
