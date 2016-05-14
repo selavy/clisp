@@ -6,6 +6,9 @@
 #include <assert.h>
 
 object_t object_create_number(double val) {
+    //DEBUG
+    printf("object_create_number\n");
+    //GUBED
     struct number_t *number = malloc(sizeof(*number));
     if (!number)
         return 0;
@@ -16,6 +19,9 @@ object_t object_create_number(double val) {
 
 // TODO: remove double quotes around string
 object_t object_create_string(const char *beg, const char *end) {
+    //DEBUG
+    printf("object_create_string\n");
+    //GUBED
     assert(beg <= end);
     struct string_t *str = malloc(sizeof(*str));
     if (str) {
@@ -33,6 +39,9 @@ object_t object_create_string(const char *beg, const char *end) {
 }
 
 object_t object_create_ident(const char *beg, const char *end) {
+    //DEBUG
+    printf("object_create_ident\n");
+    //GUBED
     assert(beg <= end);
     struct ident_t *ident = malloc(sizeof(*ident));
     if (ident) { 

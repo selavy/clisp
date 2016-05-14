@@ -54,7 +54,7 @@ int parse_term(struct _psr_t *psr, object_t *obj) {
             assert(0); // TODO: error handling
             return 1;
     }
-    printf("parse_term: "); object_debug_print(obj);
+    printf("parse_term: "); object_debug_print(*obj);
     return 0;
 }
 
@@ -78,13 +78,13 @@ int parser_parse(parser_t psr, object_t *root) {
     struct _psr_t *p = (struct _psr_t*)psr;
     if (lexer_lex(p->lexer, &p->token) != 0) // prime first token
         return 1;
-    if (parse_term(p, root) != 0)
+    if (parse_expr(p, root) != 0)
         return 1;
     if (lexer_lex(p->lexer, &p->token) == 0) // stuff was left in the stream
         return 1;
     if (p->token.type != TK_EOF)
         return 1;
-    printf("psr_parse: "); object_debug_print(root);
+    printf("psr_parse: "); object_debug_print(*root);
     return 0;
 }
 

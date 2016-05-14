@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Werror -g
+CFLAGS=-Wall -Werror -g -pedantic
 OBJS=lexer.o main.o token.o parser.o object.o
 TARGET=clisp
 LEMON=lemon
