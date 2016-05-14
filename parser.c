@@ -84,7 +84,7 @@ int parse_expr(struct _psr_t *psr, object_t *obj) {
 }
 
 int parser_parse(parser_t psr, object_t *root) {
-    struct _psr_t *p = (struct _psr_t*)psr;
+    struct _psr_t *p = psr;
     if (lexer_lex(p->lexer, &p->token) != 0) // prime first token
         return 1;
     if (parse_expr(p, root) != 0)
@@ -100,7 +100,7 @@ int parser_parse(parser_t psr, object_t *root) {
 int parser_destroy(parser_t *psr) {
     if (!*psr)
         return 0;
-    struct _psr_t *p = (struct _psr_t*)*psr;
+    struct _psr_t *p = *psr;
     lexer_destroy(&p->lexer);
     free(p);
     *psr = 0;

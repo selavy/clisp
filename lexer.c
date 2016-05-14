@@ -24,7 +24,7 @@ int lexer_init(lexer_t *lexer, const char *stream) {
 int lexer_destroy(lexer_t *lexer) {
     if (!*lexer)
         return 0;
-    struct _lexer_t *in = (struct _lexer_t*)*lexer;
+    struct _lexer_t *in = *lexer;
     free(in->stream);
     free(in);
     *lexer = 0;
@@ -32,7 +32,7 @@ int lexer_destroy(lexer_t *lexer) {
 }
 
 int lexer_lex(lexer_t lexer, struct token_t *token) {
-    struct _lexer_t *in = (struct _lexer_t*)lexer;
+    struct _lexer_t *in = lexer;
     if (in->pos >= in->end) {
         token->type = TK_EOF;
         return 1;
