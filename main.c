@@ -104,8 +104,13 @@ int main(int argc, char **argv) {
         };
         check_lexer_case("'(4 5)", &expected[0], NELEMS(expected));
     }
+    {
+        const int expected[] = { TK_IDENT };
+        check_lexer_case("+", &expected[0], NELEMS(expected));
+    }
     check_term_parser_case("123", OBJ_NUMBER);
     check_term_parser_case("\"Hello World\"", OBJ_STRING);
+    check_term_parser_case("+", OBJ_IDENT);
 
     printf("\nPassed %d test cases.\n", casenum);
     return 0;

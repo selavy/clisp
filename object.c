@@ -14,24 +14,40 @@ object_t object_create_number(double val) {
     return number;
 }
 
+// TOOD: remove double quotes around string
 object_t object_create_string(const char *beg, const char *end) {
     assert(beg <= end);
     struct string_t *str = malloc(sizeof(*str));
-    if (!str)
-        return 0; 
-    str->len = end - beg;
-    if (str->len > 0) {
-        str->str = malloc(str->len + 1);
-        memcpy(&str->str[0], beg, str->len);
-        str->str[str->len] = 0;
-    } else {
-        str = 0;
+    if (str) {
+        str->len = end - beg;
+        if (str->len > 0) {
+            str->str = malloc(str->len + 1);
+            memcpy(&str->str[0], beg, str->len);
+            str->str[str->len] = 0;
+        } else {
+            str = 0;
+        }
+        str->type = OBJ_STRING;
     }
-    str->type = OBJ_STRING;
     return str;
 }
 
-//int object_create_ident(const char *beg, const char *end, struct object_t **
+object_t object_create_ident(const char *beg, const char *end) {
+    assert(beg <= end);
+    struct ident_t *ident = malloc(sizeof(*ident));
+    if (ident) { 
+        ident->len = end - beg;
+        if (ident->len > 0) {
+            ident->name = malloc(ident->len + 1);
+            memcpy(&ident->name[0], beg, ident->len);
+            ident->name[ident->len] = 0;
+        } else {
+            ident->name = 0;
+        }
+        ident->type = OBJ_IDENT;
+    }
+    return ident;
+}
 
 const char* print_string(struct string_t *s) {
     assert(s);

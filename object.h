@@ -7,6 +7,7 @@ enum {
     OBJ_VOID,
     OBJ_NUMBER,
     OBJ_STRING,
+    OBJ_IDENT,
     OBJ_FUNCTION,
     OBJ_CONS,
     OBJ_LIST
@@ -27,8 +28,15 @@ struct number_t {
     double val;
 };
 
+struct ident_t {
+    object_type_t type;
+    char *name;
+    int64_t len;
+};
+
 object_t object_create_number(double val);
 object_t object_create_string(const char *beg, const char *end);
+object_t object_create_ident(const char *beg, const char *end);
 int object_destroy(object_t object);
 void object_debug_print(object_t obj);
 

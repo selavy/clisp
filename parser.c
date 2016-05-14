@@ -34,36 +34,51 @@ int parser_init(parser_t *psr, const char *stream) {
     return 0;
 }
 
-int parser_term(struct _psr_t *psr, object_t *obj) {
+int parse_term(struct _psr_t *psr, object_t *obj) {
     int val;
     switch (psr->token.type) {
         case TK_NUMBER:
             val = parse_int(psr->token.beg, psr->token.end);
             *obj = object_create_number(val);
-            if (!*obj)
-                return 1;
+            if (!*obj) return 1;
             break;
         case TK_STRING:
             *obj = object_create_string(psr->token.beg, psr->token.end);
-            if (!*obj)
-                return 1;
+            if (!*obj) return 1;
             break;
         case TK_IDENT:
-        assert(0);
+            *obj = object_create_ident(psr->token.beg, psr->token.end);
+            if (!*obj) return 1;
             break;
         default:
             assert(0); // TODO: error handling
             return 1;
     }
-    printf("parser_term: "); object_debug_print(obj);
+    printf("parse_term: "); object_debug_print(obj);
     return 0;
+}
+
+#define token_type(psr) (psr).token.type
+
+int parse_expr(struct _psr_t *psr, object_t *obj) {
+    if (psr->token.type == TK_LPAREN) {
+        while (lexer_lex(psr->lexer, &psr->token) == 0 && token_type(*psr) != TK_RPAREN) {
+            if (parse_term(psr, obj) != 0)
+                return 1;
+            else
+                printf("SUCCESSFULLY PARSED TERM\n");
+        }
+        return 0;
+    } else {
+        return parse_term(psr, obj);
+    }
 }
 
 int parser_parse(parser_t psr, object_t *root) {
     struct _psr_t *p = (struct _psr_t*)psr;
     if (lexer_lex(p->lexer, &p->token) != 0) // prime first token
         return 1;
-    if (parser_term(p, root) != 0)
+    if (parse_term(p, root) != 0)
         return 1;
     if (lexer_lex(p->lexer, &p->token) == 0) // stuff was left in the stream
         return 1;

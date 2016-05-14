@@ -82,13 +82,14 @@ int lexer_lex(lexer_t lexer, struct token_t *token) {
             token->type = TK_IDENT;
             token->beg = in->pos++;
             while (in->pos < in->end) {
-                if (isspace(*in->pos) || *in->pos == '"') {
+                if (isspace(*in->pos) || *in->pos == '"' || *in->pos == ')' || *in->pos == '(') {
                     token->end = in->pos;
                     return 0;
                 }
                 ++in->pos;
             }
-            return 1;
+            token->end = in->end;
+            return 0;
         }
     }
 }
