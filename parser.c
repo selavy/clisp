@@ -62,12 +62,21 @@ int parse_term(struct _psr_t *psr, object_t *obj) {
 
 int parse_expr(struct _psr_t *psr, object_t *obj) {
     if (psr->token.type == TK_LPAREN) {
+        object_t terms[100];
+        int pos = 0;
         while (lexer_lex(psr->lexer, &psr->token) == 0 && token_type(*psr) != TK_RPAREN) {
-            if (parse_term(psr, obj) != 0)
+            object_t tmp;
+            if (parse_expr(psr, &tmp) != 0)
                 return 1;
-            else
-                printf("SUCCESSFULLY PARSED TERM\n");
+            terms[pos++] = tmp;
         }
+        if (token_type(*psr) != TK_RPAREN) {
+            for (int i = 0; i < pos; ++i) free(terms[i]);
+            return 1;
+        }
+        *obj = object_create_expr(&terms[0], pos);
+        if (!*obj)
+            return 1;
         return 0;
     } else {
         return parse_term(psr, obj);

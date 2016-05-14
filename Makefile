@@ -1,5 +1,7 @@
 CC=gcc
-CFLAGS=-Wall -Werror -g -pedantic
+RELEASE=-DNDEBUG
+DEBUG=-g
+CFLAGS=-Wall -Werror $(DEBUG) -pedantic
 OBJS=lexer.o main.o token.o parser.o object.o
 TARGET=clisp
 LEMON=lemon

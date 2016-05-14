@@ -51,7 +51,18 @@ void check_term_parser_case(const char *stream, object_type_t type) {
     PASSED();
 }
 
+void check_expr_parser_case(const char *stream) {
+    parser_t parser;
+    assert(parser_init(&parser, stream) == 0);
+    object_t root;
+    assert(parser_parse(parser, &root) == 0);
+    assert(object_get_type(root) == OBJ_EXPR);
+    assert(parser_destroy(&parser) == 0);
+    PASSED();
+}
+
 int main(int argc, char **argv) {
+
     {
         const int expected[] = {
             TK_LPAREN,
@@ -112,15 +123,10 @@ int main(int argc, char **argv) {
     check_term_parser_case("\"Hello World\"", OBJ_STRING);
     check_term_parser_case("+", OBJ_IDENT);
 
-//    {
-//        const char *stream = "(+ 1 2)";
-//        parser_t parser;
-//        assert(parser_init(&parser, stream) == 0);
-//        object_t root;
-//        assert(parser_parse(parser, &root) == 0);
-//        assert(parser_destroy(&parser) == 0);
-//        PASSED();
-//    }
+    check_expr_parser_case("(+ 1 2)");
+    check_expr_parser_case("(+ 1 2 3 4 5)");
+    check_expr_parser_case("(+ (- 1 2) (- 3 4))");
+
 
     printf("\nPassed %d test cases.\n", casenum);
     return 0;

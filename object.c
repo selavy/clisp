@@ -58,6 +58,24 @@ object_t object_create_ident(const char *beg, const char *end) {
     return ident;
 }
 
+object_t object_create_expr(object_t *terms, int64_t len) {
+    //DEBUG
+    printf("object_create_expr\n");
+    //GUBED
+#ifndef NDEBUG
+    for (int64_t i = 0; i < len; ++i) {
+        assert(terms[i]);
+    }
+#endif
+    struct expr_t *expr = malloc(sizeof(*expr));
+    if (expr) {
+        expr->type = OBJ_EXPR;
+        expr->terms = terms;
+        expr->len = len;
+    }
+    return expr;
+}
+
 const char *string_print(struct string_t *s) {
     assert(s);
     assert(s->len >= 0);
@@ -130,6 +148,9 @@ void object_debug_print(object_t obj) {
             break;
         case OBJ_IDENT:
             printf("IDENT(%s)\n", ident_print(obj));
+            break;
+        case OBJ_EXPR:
+            printf("EXPR\n");
             break;
         default:
             //assert(0);
