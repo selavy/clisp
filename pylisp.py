@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 
-
 TK_UNK = 0
 TK_LPAREN = 1
 TK_RPAREN = 2
@@ -10,6 +9,7 @@ TK_NUMBER = 4
 TK_IDENT = 5
 TK_EOF = 6
     
+
 TokenString = {
         TK_UNK: 'Unknown',
         TK_LPAREN: 'LParen',
@@ -19,6 +19,7 @@ TokenString = {
         TK_IDENT: 'Ident',
         TK_EOF: 'EOF',
 }
+
 
 class Tokens(object):
     def __init__(self, text):
@@ -49,9 +50,9 @@ class Tokens(object):
             self.tval = c
         elif c.isdigit():
             self.ttyp = TK_NUMBER
-            self.val = c
+            self.tval = c
             while self.pos < self.mlen and self.text[self.pos].isdigit():
-                self.val += self.text[self.pos]
+                self.tval += self.text[self.pos]
                 self.pos += 1
         else:
             self.ttyp = TK_IDENT
@@ -62,7 +63,7 @@ class Tokens(object):
                     break
                 self.tval += c 
                 self.pos += 1
-        
+
     def match(self, typ):
         if self.ttyp == typ:
             self.advance()
@@ -76,9 +77,57 @@ class Tokens(object):
         self.match(typ)
     
     
-if __name__ == '__main__':
-    prog = "(+ x 1)"
+class Number(object):
+    def __init__(self, val):
+        self.val = float(val)
+    
+    def __str__(self):
+        return str(self.val)
+        
+    
+class Plus(object):
+    def __init__(self, args):
+        self.args = args
+        
+    def __str__(self):
+        args = [str(x) for x in self.args]
+        return 'Plus({})'.format(' '.join(args))
+    
+    
+def expr(tokens):
+    tval = tokens.tval
+    if tokens.match(TK_LPAREN):
+        result = expr(tokens)
+        tokens.expect(TK_RPAREN)
+    elif tokens.match(TK_NUMBER):
+        result = Number(tval)
+    elif tokens.match(TK_PLUS):
+        args = []
+        while tokens.ttyp != TK_RPAREN:
+            args.append(expr(tokens))
+        result = Plus(args)
+    else:
+        raise ValueError("Invalid token: [{}] -> {}".format(
+                TokenString[tokens.ttyp], tokens.tval))
+    return result
+
+
+def parse(prog):
     tokens = Tokens(prog)
     while not tokens.match(TK_EOF):
-        print "[{}]: {}".format(TokenString[tokens.ttyp], tokens.tval)
-        tokens.advance()
+        result = expr(tokens)
+    return result
+    
+
+_Debug = False
+def classname(x):
+    if _Debug:
+        return str(type(x))
+    else:
+        return str(type(x)).split('.')[1][:-2] 
+
+
+if __name__ == '__main__':
+    prog = "(+ 1 25 3)"
+    result = parse(prog)
+    print "{} -> {}".format(classname(result), result)
