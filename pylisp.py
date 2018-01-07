@@ -18,8 +18,8 @@ class TokenType(Enum):
 
 
 class Token(object):
-    def __init__(self, ttype, lexeme):
-        # TODO: add linum
+    def __init__(self, linum, ttype, lexeme):
+        self.linnum = int(linum)
         self.ttype = TokenType(ttype)
         self.lexeme = str(lexeme)
 
@@ -31,9 +31,10 @@ class Token(object):
 class Tokens(object):
     def __init__(self, source):
         self.src = source
+        self.linum = 0
         self.cur = 0
         self.end = len(source)
-        self.endtok = Token(TokenType.EOF, lexeme='EOF')
+        self.endtok = Token(-1, TokenType.EOF, lexeme='EOF')
         self.tok = self._next()
 
     def peek(self):
@@ -59,6 +60,8 @@ class Tokens(object):
         end = self.end
         src = self.src
         while i < end and src[i].isspace():
+            if src[i] == '\n':
+                self.linum += 1
             i += 1
         if not i < end:
             self.cur = i
@@ -66,35 +69,35 @@ class Tokens(object):
         c = src[i]
         i += 1
         if c == '(':
-            result = Token(TokenType.LPAREN, c)
+            result = Token(self.linum, TokenType.LPAREN, c)
         elif c == ')':
-            result = Token(TokenType.RPAREN, c)
+            result = Token(self.linum, TokenType.RPAREN, c)
         elif c == '+':
-            result = Token(TokenType.PLUS, c)
+            result = Token(self.linum, TokenType.PLUS, c)
         elif c == '-':
-            result = Token(TokenType.MINUS, c)
+            result = Token(self.linum, TokenType.MINUS, c)
         elif c == '*':
-            result = Token(TokenType.STAR, c)
+            result = Token(self.linum, TokenType.STAR, c)
         elif c == '/':
-            result = Token(TokenType.SLASH, c)
+            result = Token(self.linum, TokenType.SLASH, c)
         elif c == '"':
-            while i < end and src[i] != '"':
+            while i < end and src[i] != '"' and src[i] != '\n':
                 c += src[i]
                 i += 1
             if src[i] != '"':
                 raise ValueError("Expect '\"' to close string.")
-            result = Token(TokenType.STRING, c)
+            result = Token(self.linum, TokenType.STRING, c)
         elif c.isdigit():
             while i < end and src[i].isdigit():
                 c += src[i]
                 i += 1
-            result = Token(TokenType.NUMBER, c)
+            result = Token(self.linum, TokenType.NUMBER, c)
         elif c.isalpha():
             # TODO: allow '_'?  maybe this should be "while not src[i].isspace()"?
             while i < end and src[i].isalnum():
                 c += src[i]
                 i += 1
-            result = Token(TokenType.IDENT, c)
+            result = Token(self.linum, TokenType.IDENT, c)
         else:
             raise ValueError("Unexpected character: '{}'".format(c))
         self.cur = i
@@ -102,8 +105,6 @@ class Tokens(object):
 
 
 if __name__ == '__main__':
-    # tok = Token(TokenType.IDENT, "HelloWorld")
-    # print(str(tok))
     source = "(+ 1 2)"
     tokens = Tokens(source)
     i = 0
