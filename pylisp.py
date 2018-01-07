@@ -13,19 +13,21 @@ class TokenType(Enum):
     SLASH = auto()
     STRING = auto()
     NUMBER = auto()
+    DEFINE = auto()
+    IF = auto()
     IDENT = auto()
     EOF = auto()
 
 
 class Token(object):
     def __init__(self, linum, ttype, lexeme):
-        self.linnum = int(linum)
+        self.linum = int(linum)
         self.ttype = TokenType(ttype)
         self.lexeme = str(lexeme)
 
     def __str__(self):
         return '{ttype!s}({lexeme!s})'.format(
-                ttype=self.ttype, lexeme=self.lexeme)
+                ttype=self.ttype, lexeme=self.lexeme, i=self.linum)
 
 
 class Tokens(object):
@@ -66,6 +68,7 @@ class Tokens(object):
         if not i < end:
             self.cur = i
             return self.endtok
+        # TODO: support ';' comment
         c = src[i]
         i += 1
         if c == '(':
@@ -97,7 +100,13 @@ class Tokens(object):
             while i < end and src[i].isalnum():
                 c += src[i]
                 i += 1
-            result = Token(self.linum, TokenType.IDENT, c)
+            if c == 'define':
+                ttype = TokenType.DEFINE
+            elif c == 'if':
+                ttype = TokenType.IF
+            else:
+                ttype = TokenType.IDENT
+            result = Token(self.linum, ttype, c)
         else:
             raise ValueError("Unexpected character: '{}'".format(c))
         self.cur = i
@@ -105,7 +114,12 @@ class Tokens(object):
 
 
 if __name__ == '__main__':
-    source = "(+ 1 2)"
+    source = """
+(define foo 22)
+
+(define add (lambda (x y) (+ x y)))
+(add 1 foo)
+    """
     tokens = Tokens(source)
     i = 0
     while not tokens.match(TokenType.EOF) and i < 10:
