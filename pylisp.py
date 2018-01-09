@@ -38,6 +38,9 @@ class Token(object):
         return '{ttype!s}({lexeme!s})'.format(
                 ttype=self.ttype, lexeme=self.lexeme, i=self.linum)
 
+    def __repr__(self):
+        return self.__str__()
+
 
 class Tokens(object):
     def __init__(self, source):
@@ -47,9 +50,14 @@ class Tokens(object):
         self.end = len(source)
         self.endtok = Token(-1, TokenType.EOF, lexeme='EOF')
         self.tok = self._next()
+        self.previous = None
 
     def peek(self):
         return self.tok.ttype
+
+    def advance(self):
+        self.previous = self.tok
+        self.tok = self._next()
 
     def expect(self, ttype, msg=None):
         if self.peek() != ttype:
@@ -57,11 +65,11 @@ class Tokens(object):
                 msg = "Expected {!s}, instead received {!s}".format(
                         ttype, self.peek())
             raise ValueError(msg)
-        self.tok = self._next()
+        self.advance()
 
     def match(self, ttype):
         if self.peek() == ttype:
-            self.tok = self._next()
+            self.advance()
             return True
         else:
             return False
@@ -131,24 +139,43 @@ class Tokens(object):
         return result
 
 
-# def parse(tokens):
-#     
+def parse_error(token):
+    raise RuntimeError("[line {}] Unexpected token {}.".format(
+        token.linum, token.lexeme))
+
+
+def parse(tokens):
+    result = None
+    while not tokens.match(TokenType.EOF):
+        if tokens.match(TokenType.NUMBER):
+            result = tokens.previous
+        elif tokens.match(TokenType.STRING):
+            result = tokens.previous
+        else:
+            parse_error(self.tok)
+    return result
 
 
 if __name__ == '__main__':
-    source = """
-(define foo 22)
+#     source = """
+# (define foo 22)
+# 
+# (define add (lambda (x y) (+ x y)))
+# (add 1 foo)
+# (if (> 1 2) 1 3)
+# (if (>= 1 1) 1 3)
+#     """
+#     tokens = Tokens(source)
+#     i = 0
+#     while not tokens.match(TokenType.EOF) and i < 100:
+#         print(tokens.tok)
+#         tokens.tok = tokens._next()
+#         i += 1
+#     print(tokens.tok)
 
-(define add (lambda (x y) (+ x y)))
-(add 1 foo)
-(if (> 1 2) 1 3)
-(if (>= 1 1) 1 3)
-    """
+    source = "1234"
     tokens = Tokens(source)
-    i = 0
-    while not tokens.match(TokenType.EOF) and i < 100:
-        print(tokens.tok)
-        tokens.tok = tokens._next()
-        i += 1
-    print(tokens.tok)
+    ast = parse(tokens)
+    import pprint
+    pprint.pprint(ast)
 
