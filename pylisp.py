@@ -118,8 +118,10 @@ class Tokens(object):
             while i < end and src[i] != '"' and src[i] != '\n':
                 c += src[i]
                 i += 1
-            if src[i] != '"':
+            if not (i < end and src[i] == '"'):
                 raise ValueError("Expect '\"' to close string.")
+            c += src[i]
+            i += 1
             result = Token(self.linum, TokenType.STRING, c)
         elif c.isdigit():
             while i < end and src[i].isdigit():
@@ -157,25 +159,15 @@ def parse(tokens):
 
 
 if __name__ == '__main__':
-#     source = """
-# (define foo 22)
-# 
-# (define add (lambda (x y) (+ x y)))
-# (add 1 foo)
-# (if (> 1 2) 1 3)
-# (if (>= 1 1) 1 3)
-#     """
-#     tokens = Tokens(source)
-#     i = 0
-#     while not tokens.match(TokenType.EOF) and i < 100:
-#         print(tokens.tok)
-#         tokens.tok = tokens._next()
-#         i += 1
-#     print(tokens.tok)
-
-    source = "1234"
-    tokens = Tokens(source)
-    ast = parse(tokens)
     import pprint
-    pprint.pprint(ast)
+    sources = (
+            "1234",
+            '"Hello, World"',
+    )
+    for source in sources:
+        tokens = Tokens(source)
+        ast = parse(tokens)
+        print("Source = '{}'".format(source))
+        pprint.pprint(ast)
+        print()
 
