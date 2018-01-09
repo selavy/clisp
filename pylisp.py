@@ -2,6 +2,7 @@
 
 from enum import Enum, auto
 
+
 class TokenType(Enum):
     LPAREN = auto()
     RPAREN = auto()
@@ -141,20 +142,39 @@ class Tokens(object):
         return result
 
 
-def parse_error(token):
-    raise RuntimeError("[line {}] Unexpected token {}.".format(
-        token.linum, token.lexeme))
+def parse_error(token, msg=None):
+    if not msg:
+        msg = "Unexpected token {}".format(token.lexeme)
+    raise RuntimeError("[line {}] {}.".format(
+        token.linum, msg))
+
+
+def parse_list(tokens):
+    results = []
+    while not tokens.match(TokenType.RPAREN):
+        if tokens.match(TokenType.EOF):
+            parse_error(tokens.previous, "Expected ')' to close list.")
+        if tokens.match(TokenType.DEFINE):
+            results.append(tokens.previous)
+        elif tokens.match(TokenType.IF):
+            results.append(tokens.previous)
+        else:
+            results.append(parse(tokens))
+    return results
 
 
 def parse(tokens):
     result = None
-    while not tokens.match(TokenType.EOF):
-        if tokens.match(TokenType.NUMBER):
-            result = tokens.previous
-        elif tokens.match(TokenType.STRING):
-            result = tokens.previous
-        else:
-            parse_error(self.tok)
+    if tokens.match(TokenType.NUMBER):
+        result = tokens.previous
+    elif tokens.match(TokenType.STRING):
+        result = tokens.previous
+    elif tokens.match(TokenType.IDENT):
+        result = tokens.previous
+    elif tokens.match(TokenType.LPAREN):
+        result = parse_list(tokens)
+    else:
+        parse_error(tokens.tok)
     return result
 
 
@@ -163,11 +183,15 @@ if __name__ == '__main__':
     sources = (
             "1234",
             '"Hello, World"',
+            "(1 2 3 4)",
+            "(define foo 22)"
     )
     for source in sources:
+    # source = "(1 2 3 4)"
+    # if True:
         tokens = Tokens(source)
-        ast = parse(tokens)
         print("Source = '{}'".format(source))
+        ast = parse(tokens)
         pprint.pprint(ast)
         print()
 
