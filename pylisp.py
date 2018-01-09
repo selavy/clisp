@@ -13,20 +13,22 @@ class TokenType(Enum):
     STAR = auto()
     SLASH = auto()
     STRING = auto()
-    GT = auto(),
-    GTE = auto(),
-    LT = auto(),
-    LTE = auto(),
+    GT = auto()
+    GTE = auto()
+    LT = auto()
+    LTE = auto()
     NUMBER = auto()
     DEFINE = auto()
     IF = auto()
     IDENT = auto()
+    LAMBDA = auto()
     EOF = auto()
 
 
 KEYWORDS = {
     'define': TokenType.DEFINE,
     'if': TokenType.IF,
+    'lambda': TokenType.LAMBDA,
 }
 
 class Token(object):
@@ -158,6 +160,8 @@ def parse_list(tokens):
             results.append(tokens.previous)
         elif tokens.match(TokenType.IF):
             results.append(tokens.previous)
+        elif tokens.match(TokenType.LAMBDA):
+            results.append(tokens.previous)
         else:
             results.append(parse(tokens))
     return results
@@ -173,6 +177,14 @@ def parse(tokens):
         result = tokens.previous
     elif tokens.match(TokenType.LPAREN):
         result = parse_list(tokens)
+    elif tokens.match(TokenType.PLUS):
+        result = tokens.previous
+    elif tokens.match(TokenType.MINUS):
+        result = tokens.previous
+    elif tokens.match(TokenType.STAR):
+        result = tokens.previous
+    elif tokens.match(TokenType.SLASH):
+        result = tokens.previous
     else:
         parse_error(tokens.tok)
     return result
@@ -184,7 +196,9 @@ if __name__ == '__main__':
             "1234",
             '"Hello, World"',
             "(1 2 3 4)",
-            "(define foo 22)"
+            "(define foo 22)",
+            "(1 2 (3 4) 5)",
+            "(define add (lambda (x y) (+ x y)))",
     )
     for source in sources:
     # source = "(1 2 3 4)"
