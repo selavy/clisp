@@ -12,12 +12,21 @@ class TokenType(Enum):
     STAR = auto()
     SLASH = auto()
     STRING = auto()
+    GT = auto(),
+    GTE = auto(),
+    LT = auto(),
+    LTE = auto(),
     NUMBER = auto()
     DEFINE = auto()
     IF = auto()
     IDENT = auto()
     EOF = auto()
 
+
+KEYWORDS = {
+    'define': TokenType.DEFINE,
+    'if': TokenType.IF,
+}
 
 class Token(object):
     def __init__(self, linum, ttype, lexeme):
@@ -83,6 +92,20 @@ class Tokens(object):
             result = Token(self.linum, TokenType.STAR, c)
         elif c == '/':
             result = Token(self.linum, TokenType.SLASH, c)
+        elif c == '<':
+            if i < end and src[i] == '=':
+                c += src[i]
+                i += 1
+                result = Token(self.linum, TokenType.LTE, c)
+            else:
+                result = Token(self.linum, TokenType.LT, c)
+        elif c == '>':
+            if i < end and src[i] == '=':
+                c += src[i]
+                i += 1
+                result = Token(self.linum, TokenType.GTE, c)
+            else:
+                result = Token(self.linum, TokenType.GT, c)
         elif c == '"':
             while i < end and src[i] != '"' and src[i] != '\n':
                 c += src[i]
@@ -100,17 +123,16 @@ class Tokens(object):
             while i < end and src[i].isalnum():
                 c += src[i]
                 i += 1
-            if c == 'define':
-                ttype = TokenType.DEFINE
-            elif c == 'if':
-                ttype = TokenType.IF
-            else:
-                ttype = TokenType.IDENT
+            ttype = KEYWORDS.get(c, TokenType.IDENT)
             result = Token(self.linum, ttype, c)
         else:
             raise ValueError("Unexpected character: '{}'".format(c))
         self.cur = i
         return result
+
+
+# def parse(tokens):
+#     
 
 
 if __name__ == '__main__':
@@ -119,10 +141,12 @@ if __name__ == '__main__':
 
 (define add (lambda (x y) (+ x y)))
 (add 1 foo)
+(if (> 1 2) 1 3)
+(if (>= 1 1) 1 3)
     """
     tokens = Tokens(source)
     i = 0
-    while not tokens.match(TokenType.EOF) and i < 10:
+    while not tokens.match(TokenType.EOF) and i < 100:
         print(tokens.tok)
         tokens.tok = tokens._next()
         i += 1
