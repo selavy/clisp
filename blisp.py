@@ -52,8 +52,63 @@ def tokenize(s):
     return result
 
 
+class Tokens(object):
+    def __init__(self, src):
+        self.toks = tokenize(src)
+        self.i = 0
+
+    def adv(self):
+        if self.i < len(self.toks):
+            self.i += 1
+
+    def cur(self):
+        return self.toks[self.i]
+
+    def previous(self):
+        return self.toks[self.i - 1]
+
+    def peek(self):
+        return self.toks[self.i]
+
+    def match(self, ttype):
+        if self.peek()[0] == ttype:
+            self.adv()
+            return True
+        else:
+            return False
+
+    def expect(self, ttype):
+        if not self.match(ttype):
+            raise RuntimeError("read: error: unexpected token: '{}'".format(
+                self.cur()))
+
+
+def lparse(msg):
+    raise RuntimeError(msg)
+
+
+def read_sexpr(tokens):
+    if tokens.match(TNUM):
+        result = float(tokens.previous()[1])
+    elif tokens.match(TSYM):
+        result = str(tokens.previous()[1])
+    else:
+        lparse("read: error: unexpected token: {!s}".format(tokens.cur()))
+    return result
+
+
 if __name__ == '__main__':
     import pprint
-    source = "(+ 1 2 44.4 5)"
-    tokens = tokenize(source)
-    pprint.pprint(tokens)
+    # source = "(+ 44.2)"
+    source = "+"
+    tokens = Tokens(source)
+    result = read_sexpr(tokens)
+    pprint.pprint(result)
+
+    # source = "(+ 1 2 44.4 5)"
+    # tokens = Tokens(source)
+    # while not tokens.match(TEOF):
+    #     print(tokens.cur())
+    #     tokens.adv()
+    # # tokens = tokenize(source)
+    # # pprint.pprint(tokens)
