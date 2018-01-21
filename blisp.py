@@ -87,11 +87,33 @@ def lparse(msg):
     raise RuntimeError(msg)
 
 
+class Symbol(object):
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return 'Symbol({})'.format(self.name)
+
+    def __repr__(self):
+        return self.__str__()
+
+
+def read_list(tokens):
+    result = []
+    while not tokens.match(TCLOSE):
+        if tokens.match(TEOF):
+            lparse("read: error: expected ')' to close '('")
+        result.append(read_sexpr(tokens))
+    return result
+
+
 def read_sexpr(tokens):
     if tokens.match(TNUM):
         result = float(tokens.previous()[1])
     elif tokens.match(TSYM):
-        result = str(tokens.previous()[1])
+        result = Symbol(tokens.previous()[1])
+    elif tokens.match(TOPEN):
+        result = read_list(tokens)
     else:
         lparse("read: error: unexpected token: {!s}".format(tokens.cur()))
     return result
@@ -99,8 +121,7 @@ def read_sexpr(tokens):
 
 if __name__ == '__main__':
     import pprint
-    # source = "(+ 44.2)"
-    source = "+"
+    source = "(+ 44.2 52)"
     tokens = Tokens(source)
     result = read_sexpr(tokens)
     pprint.pprint(result)
