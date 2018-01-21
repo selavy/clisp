@@ -119,12 +119,32 @@ def read_sexpr(tokens):
     return result
 
 
+def env_get(env, name):
+    return env[name]
+
+
+def eval_(e, env):
+    if isinstance(e, float):
+        result = e
+    elif isinstance(e, Symbol):
+        result = env_get(env, e.name)
+    elif isinstance(e, list):
+        meth = eval_(e[0], env)
+        result = apply_(meth, e[1:])
+    return result
+
+
+
 if __name__ == '__main__':
     import pprint
-    source = "(+ 44.2 52)"
+    # source = "(+ 44.2 52)"
+    source = "42.7"
     tokens = Tokens(source)
     result = read_sexpr(tokens)
     pprint.pprint(result)
+    env = {}
+    r = eval_(result, env)
+    print("{}: {}".format(type(r), r))
 
     # source = "(+ 1 2 44.4 5)"
     # tokens = Tokens(source)
