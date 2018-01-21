@@ -41,6 +41,8 @@ def tokenize(s):
             result.append((TNUM, float(c)))
         elif c == '+':
             result.append((TSYM, c))
+        elif c == '-':
+            result.append((TSYM, c))
         elif c.isalpha():
             while i < mlen and s[i].isalnum():
                 c += s[i]
@@ -123,6 +125,34 @@ def env_get(env, name):
     return env[name]
 
 
+def _builtin_add(env, xs):
+    result = 0
+    for x in xs:
+        if not isinstance(x, float):
+            raise RuntimeError("<builtin::+> arguments must be floats")
+        result += x
+    return result
+
+
+def _builtin_sub(env, xs):
+    for x in xs:
+        if not isinstance(x, float):
+            raise RuntimeError("<builtin::-> arguments must be floats")
+    if len(xs) == 1:
+        result = -1. * xs[0]
+    else:
+        result = xs[0]
+        for x in xs[1:]:
+            result -= x
+    return result
+
+
+_builtins = {
+    '+': _builtin_add,
+    '-': _builtin_sub,
+}
+
+
 def eval_(e, env):
     if isinstance(e, float):
         result = e
@@ -130,26 +160,21 @@ def eval_(e, env):
         result = env_get(env, e.name)
     elif isinstance(e, list):
         meth = eval_(e[0], env)
-        result = apply_(meth, e[1:])
+        meth = _builtins[meth]
+        result = meth(env, e[1:])
     return result
-
 
 
 if __name__ == '__main__':
     import pprint
-    # source = "(+ 44.2 52)"
-    source = "42.7"
+    source = "(- 44.2 52)"
+    # source = "42.7"
     tokens = Tokens(source)
     result = read_sexpr(tokens)
     pprint.pprint(result)
-    env = {}
+    env = {
+        '+': '+',
+        '-': '-',
+    }
     r = eval_(result, env)
     print("{}: {}".format(type(r), r))
-
-    # source = "(+ 1 2 44.4 5)"
-    # tokens = Tokens(source)
-    # while not tokens.match(TEOF):
-    #     print(tokens.cur())
-    #     tokens.adv()
-    # # tokens = tokenize(source)
-    # # pprint.pprint(tokens)
