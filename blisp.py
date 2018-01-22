@@ -185,6 +185,13 @@ def apply_(env, closure, args):
     return result
 
 
+def eval_args(env, es):
+    args = []
+    for arg in es:
+        args.append(eval_(arg, env))
+    return args
+
+
 def eval_(e, env):
     if isinstance(e, float):
         result = e
@@ -192,26 +199,31 @@ def eval_(e, env):
         result = env_get(env, e)
     elif isinstance(e, list):
         meth = eval_(e[0], env)
-        args = []
-        for arg in e[1:]:
-            args.append(eval_(arg, env))
         if isinstance(meth, Symbol):
-            meth = _builtins[meth]
-            result = meth(env, args)
+            if meth.name == 'begin':
+                for x in e[1:]:
+                    result = eval_(x, env)
+            else:
+                args = eval_args(env, e[1:])
+                meth = _builtins[meth]
+                result = meth(env, args)
         else:
+            args = eval_args(env, e[1:])
             result = apply_(env, meth, args)
     return result
 
 
 if __name__ == '__main__':
     import pprint
-    source = "(+ (+ x (+ x x) (+ x x)) (+ x (+ x x x x)))"
+    # source = "(+ (+ x (+ x x) (+ x x)) (+ x (+ x x x x)))"
+    source = "(begin (+ 1 1) (+ 1 2))"
     tokens = Tokens(source)
     result = read_sexpr(tokens)
     pprint.pprint(result)
     env = {
         mksymbol('+'): mksymbol('+'),
         mksymbol('-'): mksymbol('-'),
+        mksymbol('begin'): mksymbol('begin'),
         mksymbol('x'): float(1),
     }
     r = eval_(result, env)
