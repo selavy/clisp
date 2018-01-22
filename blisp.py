@@ -169,19 +169,19 @@ _builtins = {
 
 
 def apply_(env, closure, args):
-    cenv, params, meth = closure
+    cenv, params, body = closure
     if len(params) != len(args):
         raise RuntimeError("error: eval: expected {} args, received {} args".format(
             len(params), len(args)))
     env2 = {}
-    env2.extend(env)
-    env2.extend(cenv)
+    env2.update(env)
+    env2.update(cenv)
     for param, arg in zip(params, args):
-        # TODO: move this when lambda is read in
-        if isinstance(param, Symbol):
-            raise RuntimeError("error: eval: parameters must be symbols")
+        # # TODO: move this when lambda is read in
+        # if not isinstance(param, Symbol):
+        #     raise RuntimeError("error: eval: parameters must be symbols")
         env2[param] = arg
-    result = eval_(meth, env2)
+    result = eval_(body, env2)
     return result
 
 
@@ -203,6 +203,22 @@ def eval_(e, env):
             if meth.name == 'begin':
                 for x in e[1:]:
                     result = eval_(x, env)
+            elif meth.name == 'lambda':
+                # (env, params, body)
+                # ('define' (<params>) <body>)
+                print("MAKING CLOSURE")
+                import pprint
+                pprint.pprint(e)
+                if len(e) != 3:
+                    raise RuntimeError("error: eval: malformed lambda")
+                if not isinstance(e[1], list):
+                    raise RuntimeError("error: eval: parameters must be a list")
+                for x in e[1]:
+                    if not isinstance(x, Symbol):
+                        raise RuntimeError("error: eval: parameter must be symbol: {}".format(x))
+                closure = {}
+                closure.update(env)
+                result = (closure, e[1], e[2])
             else:
                 args = eval_args(env, e[1:])
                 meth = _builtins[meth]
@@ -216,15 +232,15 @@ def eval_(e, env):
 if __name__ == '__main__':
     import pprint
     # source = "(+ (+ x (+ x x) (+ x x)) (+ x (+ x x x x)))"
-    source = "(begin (+ 1 1) (+ 1 2))"
+    # source = "(begin (+ 1 1) (+ 1 2))"
+    # source = "((lambda (x) 1) 42)"
+    source = "((lambda (y x) x) 42 27)"
     tokens = Tokens(source)
     result = read_sexpr(tokens)
     pprint.pprint(result)
-    env = {
-        mksymbol('+'): mksymbol('+'),
-        mksymbol('-'): mksymbol('-'),
-        mksymbol('begin'): mksymbol('begin'),
-        mksymbol('x'): float(1),
-    }
+    builtins = ('+', '-', 'begin', 'lambda')
+    env = {}
+    for b in builtins:
+        env[mksymbol(b)] = mksymbol(b)
     r = eval_(result, env)
     print("{}: {}".format(type(r), r))
