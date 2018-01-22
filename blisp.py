@@ -113,7 +113,7 @@ def read_sexpr(tokens):
     if tokens.match(TNUM):
         result = float(tokens.previous()[1])
     elif tokens.match(TSYM):
-        result = Symbol(tokens.previous()[1])
+        result = mksymbol(tokens.previous()[1])
     elif tokens.match(TOPEN):
         result = read_list(tokens)
     else:
@@ -122,6 +122,9 @@ def read_sexpr(tokens):
 
 
 def env_get(env, name):
+    import pprint
+    print("env_get({})".format(name))
+    pprint.pprint(env)
     return env[name]
 
 
@@ -146,38 +149,55 @@ def _builtin_sub(env, xs):
             result -= x
     return result
 
+symtab = {}
+
+def mksymbol(name):
+    global symtab
+    try:
+        return symtab[name]
+    except KeyError:
+        symtab[name] = Symbol(name)
+        return symtab[name]
+
 
 _builtins = {
-    '+': _builtin_add,
-    '-': _builtin_sub,
+    mksymbol('+'): _builtin_add,
+    mksymbol('-'): _builtin_sub,
 }
+
+
+def apply_(env, meth, args):
+    pass
 
 
 def eval_(e, env):
     if isinstance(e, float):
         result = e
     elif isinstance(e, Symbol):
-        result = env_get(env, e.name)
+        result = env_get(env, e)
     elif isinstance(e, list):
         meth = eval_(e[0], env)
-        meth = _builtins[meth]
         args = []
         for arg in e[1:]:
             args.append(eval_(arg, env))
-        result = meth(env, args)
+        if isinstance(meth, Symbol):
+            meth = _builtins[meth]
+            result = meth(env, args)
+        else:
+            result = apply_(env, meth, args)
     return result
 
 
 if __name__ == '__main__':
     import pprint
-    source = "(+ 1 (+ 2 4))"
-    # source = "42.7"
+    source = "(+ (+ x (+ x x) (+ x x)) (+ x (+ x x x x)))"
     tokens = Tokens(source)
     result = read_sexpr(tokens)
     pprint.pprint(result)
     env = {
-        '+': '+',
-        '-': '-',
+        mksymbol('+'): mksymbol('+'),
+        mksymbol('-'): mksymbol('-'),
+        mksymbol('x'): float(1),
     }
     r = eval_(result, env)
     print("{}: {}".format(type(r), r))
