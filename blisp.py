@@ -234,7 +234,10 @@ if __name__ == '__main__':
     # source = "(begin (+ 1 1) (+ 1 2))"
     # source = "((lambda (x) 1) 42)"
     # source = "((lambda (y x) x) 42 27)"
-    source = "(begin (define x 1) x)"
+    # source = "(begin (define x 1) x)"
+    # source = "(begin (define add (lambda (x y) )))"
+    # source = "((lambda (x y) (+ x y)) 3 4)"
+    source = "(begin (define add (lambda (x y) (+ x y))) (add 3 4))"
     tokens = Tokens(source)
     result = read_sexpr(tokens)
     pprint.pprint(result)
