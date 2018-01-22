@@ -121,13 +121,6 @@ def read_sexpr(tokens):
     return result
 
 
-def env_get(env, name):
-    # import pprint
-    # print("env_get({})".format(name))
-    # pprint.pprint(env)
-    return env[name]
-
-
 def _builtin_add(env, xs):
     result = 0
     for x in xs:
@@ -196,19 +189,25 @@ def eval_(e, env):
     if isinstance(e, float):
         result = e
     elif isinstance(e, Symbol):
-        result = env_get(env, e)
+        result = env[e]
     elif isinstance(e, list):
         meth = eval_(e[0], env)
         if isinstance(meth, Symbol):
             if meth.name == 'begin':
                 for x in e[1:]:
                     result = eval_(x, env)
+            elif meth.name == 'define':
+                if len(e) != 3:
+                    raise RuntimeError("error: eval: malformed define")
+                sym = e[1]
+                if not isinstance(sym, Symbol):
+                    raise RuntimeError("error: eval: symbol must be defined: {}".format(sym))
+                value = eval_(e[2], env)
+                env[sym] = value
+                result = None
             elif meth.name == 'lambda':
                 # (env, params, body)
                 # ('define' (<params>) <body>)
-                print("MAKING CLOSURE")
-                import pprint
-                pprint.pprint(e)
                 if len(e) != 3:
                     raise RuntimeError("error: eval: malformed lambda")
                 if not isinstance(e[1], list):
@@ -234,11 +233,12 @@ if __name__ == '__main__':
     # source = "(+ (+ x (+ x x) (+ x x)) (+ x (+ x x x x)))"
     # source = "(begin (+ 1 1) (+ 1 2))"
     # source = "((lambda (x) 1) 42)"
-    source = "((lambda (y x) x) 42 27)"
+    # source = "((lambda (y x) x) 42 27)"
+    source = "(begin (define x 1) x)"
     tokens = Tokens(source)
     result = read_sexpr(tokens)
     pprint.pprint(result)
-    builtins = ('+', '-', 'begin', 'lambda')
+    builtins = ('+', '-', 'begin', 'lambda', 'define')
     env = {}
     for b in builtins:
         env[mksymbol(b)] = mksymbol(b)
