@@ -161,13 +161,16 @@ def eval_(e, env):
     elif isinstance(e, list):
         meth = eval_(e[0], env)
         meth = _builtins[meth]
-        result = meth(env, e[1:])
+        args = []
+        for arg in e[1:]:
+            args.append(eval_(arg, env))
+        result = meth(env, args)
     return result
 
 
 if __name__ == '__main__':
     import pprint
-    source = "(- 44.2 52)"
+    source = "(+ 1 (+ 2 4))"
     # source = "42.7"
     tokens = Tokens(source)
     result = read_sexpr(tokens)
