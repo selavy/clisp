@@ -122,9 +122,9 @@ def read_sexpr(tokens):
 
 
 def env_get(env, name):
-    import pprint
-    print("env_get({})".format(name))
-    pprint.pprint(env)
+    # import pprint
+    # print("env_get({})".format(name))
+    # pprint.pprint(env)
     return env[name]
 
 
@@ -149,7 +149,9 @@ def _builtin_sub(env, xs):
             result -= x
     return result
 
+
 symtab = {}
+
 
 def mksymbol(name):
     global symtab
@@ -166,8 +168,21 @@ _builtins = {
 }
 
 
-def apply_(env, meth, args):
-    pass
+def apply_(env, closure, args):
+    cenv, params, meth = closure
+    if len(params) != len(args):
+        raise RuntimeError("error: eval: expected {} args, received {} args".format(
+            len(params), len(args)))
+    env2 = {}
+    env2.extend(env)
+    env2.extend(cenv)
+    for param, arg in zip(params, args):
+        # TODO: move this when lambda is read in
+        if isinstance(param, Symbol):
+            raise RuntimeError("error: eval: parameters must be symbols")
+        env2[param] = arg
+    result = eval_(meth, env2)
+    return result
 
 
 def eval_(e, env):
